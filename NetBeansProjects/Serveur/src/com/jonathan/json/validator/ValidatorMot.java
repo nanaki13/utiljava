@@ -22,23 +22,41 @@ class ValidatorMot extends ValidatorAbstract{
     public boolean processValidation() {
         int i = indiceDebut;
         char c = input.charAt(i);
-        boolean continu  = true;
-        while (continu) {
+        boolean openGuillemet = false;
+        if(c=='"'){
+            openGuillemet = true;
+            i++;
+            c = input.charAt(i);
+        }
+        while (true) {
             if( (c >= a && c<= z) || ( c >= A && c <= Z) || (c >= ZERO && c<= NEUF)||c=='_'){
                 builder.append(c);
                 i++;
                 c = input.charAt(i);
             }
             else{
-                valid = false;
-                indiceFin = i;
-                charFin = c;
-                return valid;
+                if(openGuillemet){
+                    if(c=='"'){
+                        i++;
+                        c = input.charAt(i);
+                        indiceFin = i;
+                        valid = true;
+                    }else{
+                         c = input.charAt(i);
+                        indiceFin = i;
+                        valid = false;
+                        error = "guillemt clef nom fermé";
+                    }
+                    return valid;
+                    
+                } else{
+                    valid =true;
+                    indiceFin = i;
+                    charFin = c;
+                    return valid;
+                }
             }
         }
-        indiceFin = i;
-        charFin = c;
-        return valid;
     }
     
     

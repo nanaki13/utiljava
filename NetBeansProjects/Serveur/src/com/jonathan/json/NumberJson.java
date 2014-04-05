@@ -15,7 +15,7 @@ import java.math.MathContext;
 public class NumberJson extends BigDecimal implements JsonObjectInterface,FeuilleJson<BigDecimal>{
    
     
-
+  
     public NumberJson(char[] in, int offset, int len) {
         super(in, offset, len);
     }

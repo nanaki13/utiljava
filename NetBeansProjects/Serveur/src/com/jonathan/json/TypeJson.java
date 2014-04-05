@@ -9,5 +9,5 @@ package com.jonathan.json;
  * @author jonathan
  */
 public enum TypeJson {
-    OBJET,NUMBER,TEXT,ARRAY,NULL
+    OBJET,NUMBER,TEXT,ARRAY,NULL,BOOLEAN
 }

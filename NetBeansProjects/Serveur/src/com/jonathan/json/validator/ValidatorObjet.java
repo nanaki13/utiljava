@@ -34,14 +34,19 @@ public class ValidatorObjet extends ValidatorAbstract {
             return false;
         }
         i = validator.getIndiceFin() + 1;
-        boolean continu;
-        continu = true;
         while (true) {
 
             validator = new ValidatorWhite(input, i);
             validator.processValidation();
+            System.out.println("validator.indiceFin : "+validator.charFin);
             ValidatorAbstract validatorMot = new ValidatorMot(input, validator.indiceFin);
             validatorMot.processValidation();
+            if(!validatorMot.valid){
+                error  =validatorMot.error;
+                charFin = validatorMot.charFin;
+                indiceFin = validatorMot.indiceFin;
+                return false;
+            }
             
             if (validatorMot.getIndiceFin() == validator.getIndiceFin()) {
                 valid = false;
@@ -51,6 +56,7 @@ public class ValidatorObjet extends ValidatorAbstract {
                 return valid;
             } else {
                 key = validatorMot.builder.toString();
+                System.out.println("key : "+key);
                 validator = new ValidatorWhite(input, validatorMot.getIndiceFin());
                 validator.processValidation();
                 if (validator.getCharFin() == ':') {
@@ -70,6 +76,8 @@ public class ValidatorObjet extends ValidatorAbstract {
                         validator = new ValidatorArray(input, i);
                     }else if (decideur == 'n') {
                         validator = new ValidatorNull(input,i);
+                    }else if (decideur == 't' || decideur == 'f') {
+                        validator = new ValidatorBoolean(input,i);
                     }else{
                         charFin = validator.charFin;
                         indiceFin = validator.getIndiceFin();

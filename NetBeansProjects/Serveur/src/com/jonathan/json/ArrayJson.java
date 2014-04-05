@@ -108,8 +108,8 @@ public class ArrayJson implements JsonObjectInterface {
         return ((BigDecimal) jsonObjects.get(i)).intValue();
     }
 
-    public void add(int longuerReel) {
-        add(new NumberJson(longuerReel));
+    public void add(int nb) {
+        add(new NumberJson(nb));
     }
 
     public int size() {
