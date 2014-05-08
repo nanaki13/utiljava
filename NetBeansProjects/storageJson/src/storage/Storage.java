@@ -426,7 +426,7 @@ public class Storage implements StorageInterface {
         ParserJson parserJson;
         JsonObject jsonObject;
         parserJson = new ParserJson();
-        int id;
+        //int id;
         Set< JsonObject> ret = new HashSet<>();
         try (FileReader fileReader = new FileReader(f)) {
 
@@ -475,7 +475,7 @@ public class Storage implements StorageInterface {
                 if(close){
                     parserJson.setInput(builder.toString());
                     jsonObject = parserJson.parse();
-                    id = jsonObject.getInt("id");
+             //       id = jsonObject.getInt("id");
                     ret.add( jsonObject);
                 }
                 

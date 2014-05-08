@@ -17,6 +17,7 @@ public class Film {
     private Genre genre;
     private int duree;
     private String chemin;
+    private String chemin2;
 
     public Film(int id) {
         this.id = id;

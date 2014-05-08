@@ -25,10 +25,21 @@ class ValidatorChaine extends ValidatorAbstract{
     public boolean processValidation() {
         int i = indiceDebut;
         char c = input.charAt(i);
+        System.out.println("validateur chaine : "+c);
+        if(c!='"'){
+            indiceFin=i;
+            charFin=c;
+            error = "pas d'ouverture de chaine";
+            return false;
+        }else{
+            i++;
+            c = input.charAt(i);
+        }
         while (true) {
             if(c == '\\'){
+                builder.append('\\');
                 i = i+1;
-                builder.append(input.charAt(i));
+                c = input.charAt(i);
             }else if( c == '"'){
                valid=true;
                 indiceFin = ++i;

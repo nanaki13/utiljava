@@ -9,6 +9,7 @@ import com.jonathan.json.ArrayJson;
 import com.jonathan.json.JsonObject;
 import com.jonathan.json.NumberJson;
 import com.jonathan.json.TypeJson;
+import com.jonathan.json.validator.ValidatorException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -19,7 +20,6 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -134,6 +134,16 @@ public class Serialiseur {
 //        }
     }
 
+    /**
+     *
+     * 
+     * @param clazz
+     * @return la derniere classe mere avant objet
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
     public static Class lastSuperBeforeObj(Class clazz) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 //
         Class<?> superTmp =null;
@@ -160,10 +170,9 @@ public class Serialiseur {
     }
 
     public static Map<Class, Map<Integer, Object>> cacheObject = new HashMap<>();
-    public static Set<Object> ObjectsDejaSerealise = new HashSet<Object>();
+    public static Set<Object> ObjectsDejaSerealise = new HashSet<>();
 
     public static <T> List<T> deserialise(Class<T> c, String file) {
-        //ParserJson pj = new ParserJson(new File(file));
         ArrayList<T> ar;
         ar = new ArrayList<>();
         Map<Integer, Object> mapDeC=null;
@@ -171,18 +180,12 @@ public class Serialiseur {
         try {
             superC = lastSuperBeforeObj(c);
             if (!cacheObject.containsKey(superC)) {
-            mapDeC = new HashMap<Integer, Object>();
+            mapDeC = new HashMap<>();
             cacheObject.put(superC, mapDeC);
         } else {
             mapDeC = cacheObject.get(superC);
         }
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
-            Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException ex) {
             Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -285,13 +288,124 @@ public class Serialiseur {
         }
         return ar;
     }
+    
+    public static <T> T deserialiseOneObject(Class<T> c, String file) throws ObjectReaderException {
+        try {
+            JsonObject jo = new ParserJson(new File(file)).parse();
+            Method[] methods = c.getMethods();
+            Method method = null;
+            Object[] param = new Object[1];
+            Object newInstance = c.newInstance();
+            Set<String> keys = jo.getKeys();
+            int id;
+            for (String key : keys) {
+                TypeJson type = jo.getType(key);
+                String ucFirst = ((char) ((key.charAt(0) - 'a') + 'A')) + key.substring(1);
+                switch (type) {
+                    case TEXT:
+                        method = c.getMethod(set + ucFirst, String.class);
+                        param[0] = jo.getString(key);
+                        break;
+                        
+                    case NUMBER:
+                        BigDecimal bg = (BigDecimal) jo.get(key);
+                        if (bg.scale() >= 0) {
+                            param[0] = jo.getInt(key);
+                            if (key.equals("id")) {
+                                id = (int) param[0];
+                                try {
+                                    method = c.getMethod(set + ucFirst, Integer.TYPE);
+                                } catch (NoSuchMethodException e) {
+                                    method = c.getMethod(set + ucFirst, Integer.class);
+                                }
+                                
+                            } else if (key.startsWith("id_")) {
+                                String fieldName = key.substring(3);
+                                String methodFor = set + ((char) ((fieldName.charAt(0) - 'a') + 'A')) + fieldName.substring(1);
+                                Class cFor = getClassPara(methodFor, methods);
+                                
+                                Object objForFieldObj = cacheObject.get(lastSuperBeforeObj( cFor)).get((int) param[0]);
+                                param[0] = objForFieldObj;
+                                method = c.getMethod(methodFor, cFor);
+                            } else {
+                                method = c.getMethod(set + ucFirst, Integer.TYPE);
+                            }
+                            
+                        }
+                        break;
+                    case ARRAY:
+                        if (key.startsWith("ids_")) {
+                            String fieldName = key.substring(4);
+                            String methodNameFor = set + ucFirst(fieldName);
+                            Class cFor = getClassPara(methodNameFor, methods);
+                            String name = cFor.getName();
+                            Type genericType = getGenericTpe(methodNameFor, methods);
+                            String substring = genericType.toString().substring(name.length());
+                            String genericClassName = substring.substring(1, substring.length() - 1);
+                            try {
+                                Class<?> forName = Class.forName(genericClassName);
+                                ArrayJson array = jo.getArray(key);
+                                int size = array.size();
+                                Collection col = (Collection) cFor.newInstance();
+                                
+                                for (int i = 0; i < size; i++) {
+                                    Class lastSuperBeforeObj = lastSuperBeforeObj( forName);
+                                    System.out.println(lastSuperBeforeObj);
+                                    System.out.println(cacheObject.containsKey(lastSuperBeforeObj));
+                                    if (cacheObject.containsKey(lastSuperBeforeObj)) {
+                                        Map<Integer, Object> map = cacheObject.get(lastSuperBeforeObj);
+                                        Object get1 = map.get(array.getInt(i));
+                                        col.add(get1);
+                                    }
+                                    
+                                }
+                                param[0] = col;
+                                method = c.getMethod(methodNameFor, cFor);
+                            } catch (ClassNotFoundException ex) {
+                                Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (NoSuchMethodException ex) {
+                        Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SecurityException ex) {
+                        Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IllegalArgumentException ex) {
+                        Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InvocationTargetException ex) {
+                        Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
+                    }
 
-    public static void serialiseLazy(Collection<?> c, String file) {
+                        }
+                        break;
+                }
+                if(type!=TypeJson.NULL){
+                    method.invoke(newInstance, param);
+                }
+                
+                
+                
+                
+                
+            }
+            return c.cast(newInstance);
+        } catch (ValidatorException | InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
+            throw new ObjectReaderException(ex.getMessage(), ex);
+        }
+    }
+    /**
+     * Sérealise un collection d'object en Json dans le fichier file.
+     * garde en mémoire les référence des objects déja séréalisé.
+     * si un object de la collection a déja été séréalisé même par un appelle
+     * précédant, il ne sera pas séréalisé une autre fois.
+     * si les objets propriété d'un objet à séréalisé possédent une id ()int ou Integer, juste celle ci sera séréalisé.
+     * @param objects
+     * @param file
+     */
+    public static void serialiseLazy(Collection<?> objects, String file) {
         FileWriter fw = null;
+        
 
         try {
-            Iterator<?> iterator = c.iterator();
-            fw = new FileWriter(file);
+            Iterator<?> iterator = objects.iterator();
+            
             try (BufferedWriter bw = new BufferedWriter(fw)) {
                 while (iterator.hasNext()) {
                     Object next = iterator.next();
@@ -305,23 +419,30 @@ public class Serialiseur {
                     
                 }
                 bw.flush();
+                bw.close();
+                fw.close();
             }
         } catch (IOException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException ex) {
             Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                fw.close();
+                if(fw!=null)fw.close();
             } catch (IOException ex) {
                 Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
-    public static void serialise(Collection<?> c, String file) {
+    /**
+     * Sérealise un collection d'object en Json dans le fichier file.
+     * @param objects
+     * @param file
+     */
+    public static void serialise(Collection<?> objects, String file) {
         FileWriter fw = null;
 
         try {
-            Iterator<?> iterator = c.iterator();
+            Iterator<?> iterator = objects.iterator();
             fw = new FileWriter(file);
             try (BufferedWriter bw = new BufferedWriter(fw)) {
                 while (iterator.hasNext()) {
@@ -332,12 +453,16 @@ public class Serialiseur {
                     bw.append('\n');
                 }
                 bw.flush();
+                bw.close();
             }
         } catch (IOException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException ex) {
             Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                fw.close();
+                if(fw!=null){
+                    fw.close();
+                }
+                
             } catch (IOException ex) {
                 Logger.getLogger(Serialiseur.class.getName()).log(Level.SEVERE, null, ex);
             }

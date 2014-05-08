@@ -4,16 +4,40 @@
  */
 package com.jonathan.json.validator;
 
+import com.jonathan.json.ArrayJson;
 import com.jonathan.json.JsonObject;
-import com.jonathan.json.JsonObjectInterface;
 import com.jonathan.json.NumberJson;
 import com.jonathan.json.TextJson;
+import parser.ParserJson;
 
 /**
  *
  * @author jonathan
  */
 public class ValidatorObjet extends ValidatorAbstract {
+    
+    public static void main(String[] args) throws ValidatorException {
+        JsonObject jo = new JsonObject();
+        JsonObject jo2 = new JsonObject();
+        jo2.put("bli", "deseded");
+        NumberJson numberJson = new NumberJson(3);
+        ArrayJson aj = new ArrayJson();
+        aj.add(numberJson);
+        aj.add(new TextJson("bab abab"));
+        jo.put("i\\nB'\\\"B'B", new NumberJson("3.2"));
+        jo.put("nom", "paul");
+        jo.put("obj", jo2);
+        jo.put("array", aj);
+        jo.setGuillemetOnKey(true);
+        System.out.println(jo.toStringJsonPretty());
+        ParserJson parserJson = new ParserJson(jo.toStringJsonPretty());
+        JsonObject parse = parserJson.parse();
+        parse.setGuillemetOnKey(true);
+        System.out.println(parse.toStringJsonPretty());
+
+
+
+    }
 
     public ValidatorObjet(String input, int indiceDebut) {
         super(input, indiceDebut);
@@ -21,7 +45,7 @@ public class ValidatorObjet extends ValidatorAbstract {
     }
     private JsonObject jsonObject;
     @Override
-    public boolean processValidation() throws ValidatorException {
+    public boolean processValidation()  {
         char c;
         int i = indiceDebut;
         jsonObject = new JsonObject();
@@ -38,7 +62,7 @@ public class ValidatorObjet extends ValidatorAbstract {
 
             validator = new ValidatorWhite(input, i);
             validator.processValidation();
-            System.out.println("validator.indiceFin : "+validator.charFin);
+            System.out.println("validator.charFin : "+validator.charFin);
             ValidatorAbstract validatorMot = new ValidatorMot(input, validator.indiceFin);
             validatorMot.processValidation();
             if(!validatorMot.valid){
@@ -62,25 +86,10 @@ public class ValidatorObjet extends ValidatorAbstract {
                 if (validator.getCharFin() == ':') {
                     validator = new ValidatorWhite(input, validator.getIndiceFin() + 1);
                     validator.processValidation();
-                    char decideur = validator.getCharFin();
-                    i = validator.getIndiceFin();
-                    if (decideur == '\"') {
-                        validator = new ValidatorChaine(input, validator.getIndiceFin() + 1);
-
-                    } else if (decideur == '{') {
-                        validator = new ValidatorObjet(input, i);
-
-                    } else if (decideur >= '0' && decideur <= '9') {
-                        validator = new ValidatorNombre(input, i);
-                    } else if (decideur == '[') {
-                        validator = new ValidatorArray(input, i);
-                    }else if (decideur == 'n') {
-                        validator = new ValidatorNull(input,i);
-                    }else if (decideur == 't' || decideur == 'f') {
-                        validator = new ValidatorBoolean(input,i);
-                    }else{
-                        charFin = validator.charFin;
-                        indiceFin = validator.getIndiceFin();
+                    charFin = validator.charFin;
+                    indiceFin = validator.getIndiceFin();
+                    validator = FinderValidator.getGoodValidator(validator);
+                    if(validator == null){   
                         error = "valeur d'objet non conforme";
                         valid = false;
                         return valid;

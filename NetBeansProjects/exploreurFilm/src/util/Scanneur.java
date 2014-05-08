@@ -32,21 +32,20 @@ public class Scanneur {
                 
             }
             listIn = repertoire.listFiles(new FilmFileFilter());
-            System.out.println("repertoire : "+repertoire);
-            System.out.println("nombre de film dans rep : "+listIn.length);
+//            System.out.println("repertoire : "+repertoire);
+//            System.out.println("nombre de film dans rep : "+listIn.length);
             list = new File[nbSousFilm + listIn.length];
             k = 0;
             for (int i = 0; i < listeRep.length; i++) {
-                for (int j = 0; j < listeFilmRep[i].length; j++) {
-                    
-                    list[k] = listeFilmRep[i][j];
+                for (File item : listeFilmRep[i]) {
+                    list[k] = item;
                     k++;
                 }
             }
             listIn = repertoire.listFiles(new FilmFileFilter());
-            for (int i = 0; i < listIn.length; i++) {
-                 System.out.println("         "+listIn[i]);
-                list[k] = listIn[i];
+            for (File listIn1 : listIn) {
+                System.out.println("         " + listIn1);
+                list[k] = listIn1;
                 k++;
             }
         }
