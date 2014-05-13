@@ -5,7 +5,7 @@
 package util;
 
 import java.io.File;
-import metier.Film;
+import com.jonathan.metier.Film;
 
 
 
@@ -29,7 +29,7 @@ public class MainFilm {
             File file = listeCheminFilm[i];
           //  System.out.println(file.getAbsolutePath());
             films[i] = new Film();
-            films[i].setChemin(file.getAbsolutePath());
+//            films[i].setChemin(file.getAbsolutePath());
         }
         System.out.println("nombre de film trouvé : "+films.length);
     }

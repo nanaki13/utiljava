@@ -5,12 +5,12 @@
 package com.jonathan.json;
 
 import com.jonathan.json.validator.ValidatorException;
-import parser.ParserJson;
+import com.jonathan.json.parser.ParserJson;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import lib.string.StringTool;
+import com.jonathan.lib.string.StringTool;
 
 /**
  *
@@ -18,7 +18,7 @@ import lib.string.StringTool;
  */
 public class JsonObject implements JsonObjectInterface {
 
-    private boolean guillemetOnKey;
+    private boolean guillemetOnKey = true;
     private char textEncloser = '"';
 
     public void setTextEncloser(char textEncloser) {
@@ -59,12 +59,11 @@ public class JsonObject implements JsonObjectInterface {
 
     public JsonObject(Map<String, JsonObjectInterface> data) {
         this.data = data;
-        guillemetOnKey = false;
+        
     }
 
     public JsonObject() {
         this.data = new HashMap<>();
-        guillemetOnKey = false;
     }
 
     @Override

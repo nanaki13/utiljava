@@ -17,15 +17,91 @@
 
 package exploreurfilm;
 
+import com.jonathan.json.parser.ParserJson;
+import com.jonathan.metier.Acteur;
+import com.jonathan.metier.Film;
+import com.jonathan.metier.Genre;
+import com.jonathan.metier.Realisateur;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import storage.DataJson;
+import sun.java2d.loops.CompositeType;
+
 /**
  *
  * @author jonathan
  */
 public class Controleur implements ControleurInterface{
+    
+    private List<Genre> genres;
+    private List<Film> films;
+    private List<Acteur> acteurs;
+    private List<Realisateur> realisateur;
+    private final DataJson dataJson;
+    
+    public Controleur(){
+        dataJson = new DataJson();
+        genres = dataJson.deserialise(Genre.class, "genres.json");
+    }
 
     @Override
     public void exit() {
+        dataJson.serialiseLazy(genres, "genres.json");
         System.exit(0);
     }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
+    public List<Film> getFilms() {
+        return films;
+    }
+
+    public List<Acteur> getActeurs() {
+        return acteurs;
+    }
+
+    public List<Realisateur> getRealisateur() {
+        return realisateur;
+    }
+    
+    public static int findFreeId(List<?> objects) {
+        if (objects.isEmpty()) {
+            return 1;
+        } else {
+            try {
+                int idBefore = -1;
+                int idCandidat = -1;
+                Method methodGet = objects.get(0).getClass().getMethod("getId", (Class<?>[]) null);
+                System.out.println(methodGet.getParameterTypes());
+                for (Object o : objects) {
+                    idCandidat = (int) methodGet.invoke(o, (Object[]) null);
+                    if (idBefore == -1) {
+                        idBefore = idCandidat;
+                    }
+                    idCandidat = Math.max(idCandidat, idBefore);
+                    
+                }
+                return ++idCandidat;
+            } catch (    NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                Logger.getLogger(Controleur.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return -1;
+        }
+    }
+    
+    public static void main(String[] args){
+        Genre g = new Genre(1, "cacca");
+        List<Genre> l = new ArrayList<>();
+        l.add(g);
+        System.out.println(findFreeId(l));
+    }
+    
+    
     
 }

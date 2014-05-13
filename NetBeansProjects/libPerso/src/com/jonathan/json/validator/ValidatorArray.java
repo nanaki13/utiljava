@@ -5,7 +5,7 @@
 package com.jonathan.json.validator;
 
 import com.jonathan.json.ArrayJson;
-import lib.string.StringTool;
+import com.jonathan.lib.string.StringTool;
 
 /**
  *

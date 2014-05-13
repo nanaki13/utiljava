@@ -4,7 +4,7 @@
  */
 package com.jonathan.json;
 
-import lib.string.StringTool;
+import com.jonathan.lib.string.StringTool;
 
 /**
  *

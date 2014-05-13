@@ -19,10 +19,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,11 +33,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import metier.Acteur;
-import metier.Film;
-import metier.Pays;
-import metier.Realisateur;
-import parser.ParserJson;
+
+import com.jonathan.json.parser.ParserJson;
+import com.jonathan.metier.Acteur;
+import com.jonathan.metier.Film;
+import com.jonathan.metier.Pays;
+import com.jonathan.metier.Realisateur;
 
 /**
  *
@@ -50,17 +50,58 @@ public class DataJson {
     private static final String set = "set";
 
     public static void main(String[] a) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, ObjectReaderException {
-        
-        test();
+        test2();
+
+//        test();
+    }
+
+    public static void objectToFile(Object o, String file) {
+        try {
+            JsonObjectInterface objectToJsonObject = DataJson.objectToJsonObject(o);
+
+            File f = new File(file);
+            try (FileWriter fw = new FileWriter(f)) {
+                fw.write(objectToJsonObject.toStringJson());
+            }
+        } catch (ObjectReaderException | IOException ex) {
+            Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public static <T> T FileToObject(Class<T> aClass, String file) {
+        try {
+            JsonObject fileToOneJson = Storage.fileToOneJson(new File(file));
+            return deserialiseOneObject(aClass, fileToOneJson);
+        } catch (ObjectReaderException ex) {
+            Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    public void clearCacheDeserealisation() {
+        cacheObject.clear();
+    }
+
+    public void clearCacheSerealisation() {
+        objectsDejaSerealise.clear();
     }
 
     public static class Test {
 
         private String string;
         private int nb;
+        private int id;
         private boolean boo;
         private List<Integer> listInt;
         private List<Test> listTest;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
 
         public List<Test> getListTest() {
             return listTest;
@@ -94,6 +135,10 @@ public class DataJson {
             this.boo = boo;
         }
 
+        public boolean isBoo() {
+            return boo;
+        }
+
         public void setListInt(List<Integer> listInt) {
             this.listInt = listInt;
         }
@@ -109,6 +154,7 @@ public class DataJson {
         jo.put("string", "balzla");
         jo.put("nb", 123);
         jo.put("boo", true);
+        jo.put("id", 1);
         ArrayJson aj = new ArrayJson();
         aj.add(0);
         aj.add(2);
@@ -118,24 +164,38 @@ public class DataJson {
         Test test2 = deserialiseOneObject(Test.class, jo);
         List<Test> l = new ArrayList<>();
         l.add(test1);
+        l.add(test);
         l.add(test2);
-        test.setListTest(l);
-       // DataJson dt = new DataJson();
+        test.setId(2);
+        test2.setId(3);
+//        test.setListTest(l);
+        // DataJson dt = new DataJson();
         //  dt.ser
         jo = (JsonObject) objectToJsonObject(test);
         System.out.println(jo.toStringJsonPretty());
         test = deserialiseOneObject(Test.class, jo);
-        
+        System.out.println(test.boo);
         DataJson dt = new DataJson();
-     
-        
+
+        Test test3 = new Test();
+        test3.setListTest(l);
+        List<Test> l2 = new ArrayList<>();
+        l2.add(test3);
+        dt.serialiseLazy(l2, "test2.json");
+        dt.serialiseLazy(l, "test.json");
+        dt.clearCacheDeserealisation();
+        List<Test> deserialise = dt.deserialise(Test.class, "test.json");
+        List<Test> deserialise2 = dt.deserialise(Test.class, "test2.json");
+        System.out.println(deserialise2.get(0).getListTest().get(0));
+        System.out.println(deserialise2.get(0).getString());
+
     }
 
     public static void test() {
         Film film = new Film(4);
         film.setSynopsis("un petit film sympas");
         film.setTitre("l'arnaque");
-        film.setChemin("/jsdjd/");
+        film.addChemin("/jsdjd/");
         Acteur acteur = new Acteur();
         acteur.setId(3);
         acteur.setNom("Newman");
@@ -219,12 +279,9 @@ public class DataJson {
      *
      * @param clazz
      * @return la derniere classe mere avant objet
-     * @throws IllegalAccessException
      * @throws IllegalArgumentException
-     * @throws InvocationTargetException
-     * @throws InstantiationException
      */
-    public static Class lastSuperBeforeObj(Class clazz) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+    public static Class lastSuperBeforeObj(Class clazz) {
 //
         Class<?> superTmp = null;
         if (clazz.equals(Object.class)) {
@@ -248,23 +305,20 @@ public class DataJson {
     }
 
     public Map<Class, Map<Integer, Object>> cacheObject = new HashMap<>();
-    public Set<Object> ObjectsDejaSerealise = new HashSet<>();
+    public Set<Object> objectsDejaSerealise = new HashSet<>();
 
     public <T> List<T> deserialise(Class<T> c, String file) {
         ArrayList<T> ar;
         ar = new ArrayList<>();
-        Map<Integer, Object> mapDeC = null;
+        Map<Integer, Object> mapDeC ;
         Class superC;
-        try {
-            superC = lastSuperBeforeObj(c);
-            if (!cacheObject.containsKey(superC)) {
-                mapDeC = new HashMap<>();
-                cacheObject.put(superC, mapDeC);
-            } else {
-                mapDeC = cacheObject.get(superC);
-            }
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException ex) {
-            Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
+
+        superC = lastSuperBeforeObj(c);
+        if (!cacheObject.containsKey(superC)) {
+            mapDeC = new HashMap<>();
+            cacheObject.put(superC, mapDeC);
+        } else {
+            mapDeC = cacheObject.get(superC);
         }
 
         try {
@@ -326,7 +380,7 @@ public class DataJson {
                                     Class<?> forName = Class.forName(genericClassName);
                                     ArrayJson array = jo.getArray(key);
                                     int size = array.size();
-                                    Collection col = (Collection) cFor.newInstance();
+                                    Collection col = new ArrayList();
 
                                     for (int i = 0; i < size; i++) {
                                         Class lastSuperBeforeObj = lastSuperBeforeObj(forName);
@@ -345,9 +399,15 @@ public class DataJson {
 
                             }
                             break;
+
                     }
                     if (type != TypeJson.NULL) {
-                        method.invoke(newInstance, param);
+                        if(method != null)
+                            method.invoke(newInstance, param);
+                        else{
+                            
+                        }
+                            
                     }
 
                 }
@@ -472,17 +532,20 @@ public class DataJson {
             Iterator<?> iterator = objects.iterator();
             fw = new FileWriter(file);
             try (BufferedWriter bw = new BufferedWriter(fw)) {
+                bw.write('[');
                 while (iterator.hasNext()) {
                     Object next = iterator.next();
-                    if (!ObjectsDejaSerealise.contains(next)) {
+                    if (!objectsDejaSerealise.contains(next)) {
                         bw.append(ObjectToJsonObjectLazy(next).toStringJson());
                         if (iterator.hasNext()) {
                             bw.append(',');
+                            bw.append('\n');
                         }
-                        bw.append('\n');
+                        
                     }
 
                 }
+                 bw.write(']');
                 bw.flush();
                 bw.close();
                 fw.close();
@@ -491,7 +554,9 @@ public class DataJson {
             Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                fw.close();
+                if (fw != null) {
+                    fw.close();
+                }
             } catch (IOException ex) {
                 Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -507,7 +572,7 @@ public class DataJson {
     public void serialise(Collection<?> objects, String file) {
         FileWriter fw = null;
         try {
-            
+
             Iterator<?> iterator = objects.iterator();
             fw = new FileWriter(file);
             try (BufferedWriter bw = new BufferedWriter(fw)) {
@@ -522,25 +587,49 @@ public class DataJson {
             } catch (ObjectReaderException ex) {
                 Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }   catch (IOException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     // static F jo = new JsonObject();
-    public JsonObject ObjectToJsonObjectLazy(Object objetASerealis) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+    public JsonObjectInterface ObjectToJsonObjectLazy(Object objetASerealis) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
         //  File f = new File(o.getClass().getSimpleName());
 
-        JsonObject jo = new JsonObject();
-        Map<String, Method> mapMethod = new HashMap<>();
         Class<? extends Object> aClass = objetASerealis.getClass();
+        if (aClass.equals(Integer.class)) {
+            Integer i = (Integer) objetASerealis;
+            return new NumberJson(i);
+        } else if (aClass.equals(Float.class)) {
+            Float i = (Float) objetASerealis;
+            return new NumberJson(i);
+        } else if (aClass.equals(Long.class)) {
+            Long i = (Long) objetASerealis;
+            return new NumberJson(i);
+        } else if (aClass.equals(Double.class)) {
+            Double i = (Double) objetASerealis;
+            return new NumberJson(i);
+        } else if (aClass.equals(String.class)) {
+            String i = (String) objetASerealis;
+            return new TextJson(i);
+        } else if (aClass.equals(Boolean.class)) {
+            Boolean i = (Boolean) objetASerealis;
+            return (i == true) ? BooleanJson.TRUE : BooleanJson.FALSE;
+        }
+        JsonObject jo = new JsonObject();
         Method[] methods = aClass.getMethods();
+
         for (int i = 0; i < methods.length; i++) {
             Method method;
             method = methods[i];
             String name = method.getName();
+            int modifiers = method.getModifiers();
+            if (Modifier.isStatic(modifiers)
+                    || Modifier.isPrivate(modifiers) || Modifier.isTransient(modifiers)) {
+                continue;
+            }
             boolean matches;
-            matches = (name.charAt(0) == 'g') && (name.charAt(1) == 'e') && (name.charAt(2) == 't');
+            matches = (name.startsWith(get));
             if (matches) {
                 Class<?> returnType = method.getReturnType();
                 String ReturnTypeName = method.getReturnType().getName();
@@ -573,6 +662,11 @@ public class DataJson {
                                 jo.put(nomApresGet, x);
                                 break;
                             }
+                            case "boolean": {
+                                boolean x = (boolean) method.invoke(objetASerealis, (Object[]) null);
+                                jo.put(nomApresGet, x);
+                                break;
+                            }
                         }
                     }
                 } else if (returnType.equals(String.class)) {
@@ -587,15 +681,15 @@ public class DataJson {
                     try {
                         Method getMethodOfReturnType = returnType.getMethod("getId");
                         Object invoke = method.invoke(objetASerealis, (Object[]) null);
-                        if (!ObjectsDejaSerealise.contains(invoke)) {
+                        if (!objectsDejaSerealise.contains(invoke)) {
                             if (invoke != null) {
                                 Object idObj = getMethodOfReturnType.invoke(invoke, (Object[]) null);
                                 jo.put("id_" + nomApresGet, new NumberJson((int) idObj));
                             }
                         }
                     } catch (NoSuchMethodException | SecurityException ex) {
-                        Class avtDerniereClass = lastSuperBeforeObj(returnType);
-                        if (avtDerniereClass.equals(AbstractCollection.class)) {
+
+                        if (Collection.class.isAssignableFrom(returnType)) {
                             Collection<?> x = (Collection<?>) method.invoke(objetASerealis, (Object[]) null);
                             if (x != null) {
                                 boolean isSerialisable = false, first = true, breakk = false;
@@ -607,7 +701,7 @@ public class DataJson {
                                         try {
                                             methodObjectCol = object.getClass().getMethod("getId", new Class[0]);
                                             isSerialisable = true;
-                                            if (!ObjectsDejaSerealise.contains(object)) {
+                                            if (!objectsDejaSerealise.contains(object)) {
                                                 Object invoke = methodObjectCol.invoke(object, (Object[]) null);
                                                 aj = new ArrayJson();
                                                 aj.add(new NumberJson((int) invoke));
@@ -640,9 +734,18 @@ public class DataJson {
                     }
 
                 }
+            } else if (name.startsWith("is")) {
+                String nomApresIs = name.substring(2);
+                nomApresIs = lcFirst(nomApresIs);
+                Class<?> returnType = method.getReturnType();
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                if ((returnType.equals(Boolean.class) || returnType.equals(Boolean.TYPE)) && parameterTypes.length == 0) {
+                    Boolean b = (Boolean) method.invoke(objetASerealis, (Object[]) null);
+                    jo.put(nomApresIs, b);
+                }
             }
         }
-        ObjectsDejaSerealise.add(objetASerealis);
+        objectsDejaSerealise.add(objetASerealis);
         return jo;
     }
 

@@ -7,8 +7,8 @@ package com.jonathan.json.validator;
 import com.jonathan.json.TextJson;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import lib.string.StringException;
-import lib.string.StringTool;
+import com.jonathan.lib.string.StringException;
+import com.jonathan.lib.string.StringTool;
 
 /**
  *

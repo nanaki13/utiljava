@@ -8,7 +8,7 @@ package storage;
  *
  * @author jonathan
  */
-class ObjectReaderException extends Exception {
+public class ObjectReaderException extends Exception {
 
     public ObjectReaderException(String msg) {
         super(msg);

@@ -7,7 +7,7 @@ package storage;
 import com.jonathan.json.ArrayJson;
 import com.jonathan.json.JsonObject;
 import com.jonathan.json.JsonObjectInterface;
-import parser.ParserJson;
+import com.jonathan.json.parser.ParserJson;
 import com.jonathan.json.validator.ValidatorException;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -462,14 +462,7 @@ public class Storage implements StorageInterface {
                 if (i == -1) {
                     if (!close && open) {
                         throw new ObjectReaderException("nombre de paranthèse nom conforme : fin du fichier atteind");
-//                    } else {
-//                        if (close) {
-//                            jsonObject = parserJson.parse();
-//                            id = jsonObject.getInt("id");
-//                            ret.put(id, jsonObject);
-//                        } else if(ret.isEmpty()) {
-//                            throw new ObjectReaderException("aucune d'ouverture ({)");
-//                        }
+
                     }
                 }
                 if(close){
@@ -485,5 +478,59 @@ public class Storage implements StorageInterface {
             throw new ObjectReaderException("erreur !", ex);
         }
         return ret;
+    }
+    public static JsonObject fileToOneJson(File f) throws ObjectReaderException  {
+        int i;
+        ParserJson parserJson;
+        JsonObject jsonObject = null;
+        parserJson = new ParserJson();
+        //int id;
+
+        try (FileReader fileReader = new FileReader(f)) {
+
+            boolean open,close;
+            i = fileReader.read();
+            while (i != -1) {
+                StringBuilder builder = new StringBuilder();
+                int cptOpen = 0;
+                open=false;
+                close=false;
+                while (i != -1 && !close) {
+                    char c = (char) i;
+//                    System.out.println(c);
+                    if (c == '{') {
+                        if (!open) {
+                            open = true;
+                        }
+                        cptOpen++;
+                    } else if (c == '}') {
+                        cptOpen--;
+                        if (cptOpen == 0) {
+                            open = false;
+                            close = true;
+                            builder.append(c);
+                        }
+                    }
+
+                    if (open) {
+                        builder.append(c);
+                    }
+                    i=fileReader.read();
+                }
+                if (i == -1) {
+                    if (!close && open) {
+                        throw new ObjectReaderException("nombre de paranthèse nom conforme : fin du fichier atteind");
+
+                    }
+                }
+                if(close){
+                    parserJson.setInput(builder.toString());
+                    jsonObject = parserJson.parse();
+                }
+            }
+        }  catch (IOException |ObjectReaderException | ValidatorException ex) {
+            throw new ObjectReaderException("erreur !", ex);
+        }
+        return jsonObject;
     }
 }

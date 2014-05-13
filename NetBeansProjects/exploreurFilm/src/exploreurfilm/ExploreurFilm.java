@@ -36,7 +36,7 @@ import javax.swing.JSplitPane;
 import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import lib.string.StringTool;
+import com.jonathan.lib.string.StringTool;
 
 /**
  *
@@ -45,7 +45,7 @@ import lib.string.StringTool;
 public class ExploreurFilm {
 
     public static void main(String[] args) {
-        ControleurInterface c = new Controleur();
+        Controleur c = new Controleur();
         ExploreurFilm exploreurFilm = new ExploreurFilm(c);
     }
     private final JFrame jf;
@@ -53,7 +53,9 @@ public class ExploreurFilm {
     private final JPanel vueG;
     private final JScrollPane scrolPaneG;
     private final JPanel vueD;
-    public ExploreurFilm(final ControleurInterface c) {
+    private Controleur controleur;
+    public ExploreurFilm(final Controleur c) {
+        this.controleur = c;
         jf = new JFrame("test");
         // --------------- CRETAION MENU
         menuBar = new JMenuBar();
@@ -145,7 +147,7 @@ public class ExploreurFilm {
         
         jf.addWindowListener(w);
         jf.pack();
-        jf.setSize(new Dimension(300, 300));
+        jf.setSize(new Dimension(900, 600));
         jf.setLocationRelativeTo(null);
         jf.setVisible(true);
 
@@ -157,28 +159,32 @@ public class ExploreurFilm {
         JPanel jp = new JPanel();
         jp.setBackground(Color.red);
         BoxLayout lm = new BoxLayout(jp, BoxLayout.Y_AXIS); 
-        final JPanelNvFilm jpNvFilm = new JPanelNvFilm();
+        final VueNvFilm jpNvFilm = new VueNvFilm(controleur.getGenres());
         
         jp.setLayout(lm);
-        JList<String> jl = new JList(filmPathCol.toArray(new String[filmPathCol.size()]));
+        final JList<String> jl = new JList(filmPathCol.toArray(new String[filmPathCol.size()]));
         final ListModel<String> model = jl.getModel();
         
         jl.addListSelectionListener(new ListSelectionListener() {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                System.out.println(e);
-                System.out.println(model.getElementAt(e.getFirstIndex()));
-                String elementAt = model.getElementAt(e.getFirstIndex());
+                
+                System.out.println(e.getSource());
+                System.out.println("first indtex : "+e.getFirstIndex());
+                System.out.println("last : "+e.getLastIndex());
+                System.out.println(jl.getSelectedValue());
+                
+                String elementAt = jl.getSelectedValue();
                 jpNvFilm.getTitreJt().setText(StringTool.take(elementAt, '/', '.'));
                 vueD.removeAll();
                 vueD.add(jpNvFilm.getJpanel());
                 jf.revalidate();
                 jf.repaint();
-                jf.repaint();
             }
         });
-        jl.setDragEnabled(true);
+        
+        jl.setDragEnabled(false);
         jl.setCellRenderer(new StringCellRender());
 
         

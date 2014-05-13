@@ -8,7 +8,7 @@ import com.jonathan.json.ArrayJson;
 import com.jonathan.json.JsonObject;
 import com.jonathan.json.NumberJson;
 import com.jonathan.json.TextJson;
-import parser.ParserJson;
+import com.jonathan.json.parser.ParserJson;
 
 /**
  *

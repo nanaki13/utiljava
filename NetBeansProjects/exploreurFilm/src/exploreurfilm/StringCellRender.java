@@ -22,7 +22,7 @@ import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import lib.string.StringTool;
+import com.jonathan.lib.string.StringTool;
 
 /**
  *
@@ -61,7 +61,7 @@ public class StringCellRender extends JLabel implements ListCellRenderer<Object>
          } else {
              background = Color.WHITE;
              foreground = Color.BLACK;
-         };
+         }
 
          setBackground(background);
          setForeground(foreground);
