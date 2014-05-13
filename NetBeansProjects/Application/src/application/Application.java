@@ -12,6 +12,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import storage.DataJson;
+import storage.ObjectReaderException;
+
 
 /**
  *
@@ -22,15 +24,15 @@ public class Application {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IOException {
+    public static void main(String[] args) throws  ObjectReaderException, IOException {
         Config config = new Config();
         config.setFirstTime(true);
         config.setDataPath("/home/jonathan/trzst");
-        JsonObjectInterface objectToJsonObject = DataJson.objectToJsonObject(config);
-        File f = new File("test.json");
-        FileWriter fw = new FileWriter(f);
-        fw.write(objectToJsonObject.toStringJson());
-        fw.close();
+        DataJson.objectToFile(config, "config.json");
+        
+        config = DataJson.FileToObject(Config.class, "config.json" );
+        
+        
     }
     
 }

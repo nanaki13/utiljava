@@ -174,6 +174,11 @@ public class VueNvFilm implements ActionListener {
     }
     
     public Film getNewFilm(){
+        Film ret = new Film();
+        ret.setTitre(titreJt.getText());
+        ret.setSynopsis(synopsisJt.getText());
+        ret.setDateRealisation(null);
+        
       return new Film();
     }
 

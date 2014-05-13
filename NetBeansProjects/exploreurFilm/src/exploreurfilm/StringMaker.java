@@ -17,29 +17,10 @@
 
 package exploreurfilm;
 
-import com.jonathan.metier.Genre;
-import javax.swing.DefaultComboBoxModel;
-
 /**
  *
  * @author jonathan
  */
-class GenreComboBoxModel extends DefaultComboBoxModel<Genre>{
-
-    public GenreComboBoxModel(Genre[] genreArray) {
-        super(genreArray);
-       
-        Genre addNewGenre = new  Genre();
-         addNewGenre.setId(-1);
-        addNewGenre.setNom("ajouter");
-         insertElementAt(addNewGenre, 0);
-        addNewGenre = new  Genre();
-        addNewGenre.setId(-1);
-        addNewGenre.setNom(" ");
-         insertElementAt(addNewGenre, 0);
-         setSelectedItem(addNewGenre);
-        
-       
-    }
-    
+public interface StringMaker<T> {
+    public String buildString(T t);
 }
