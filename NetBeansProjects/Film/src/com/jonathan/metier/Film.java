@@ -12,8 +12,8 @@ public class Film {
     private Pays origine;
     private Pays lieuxDeTournage;
     private String synopsis;
-    private List<Realisateur> realisateurs;
-    private List<Acteur> acteurs;
+    private List<MembreFilm> realisateurs;
+    private List<MembreFilm> acteurs;
 
     private Genre genre;
     private int duree;
@@ -27,11 +27,11 @@ public class Film {
 
     }
 
-    public List<Acteur> getActeurs() {
+    public List<MembreFilm> getActeurs() {
         return acteurs;
     }
 
-    public void setActeurs(ArrayList<Acteur> acteurs) {
+    public void setActeurs(List<MembreFilm> acteurs) {
         this.acteurs = acteurs;
     }
 
@@ -83,11 +83,11 @@ public class Film {
         this.synopsis = synopsis;
     }
 
-    public List<Realisateur> getRealisateurs() {
+    public List<MembreFilm> getRealisateurs() {
         return realisateurs;
     }
 
-    public void setRealisateurs(ArrayList<Realisateur> realisateurs) {
+    public void setRealisateurs(List<MembreFilm> realisateurs) {
         this.realisateurs = realisateurs;
     }
 

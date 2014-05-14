@@ -13,7 +13,7 @@ import java.util.Date;
 public class Recompense {
     private int id;
     private String label;
-    private Date anne;
+
 
     public int getId() {
         return id;
@@ -31,12 +31,5 @@ public class Recompense {
         this.label = label;
     }
 
-    public Date getAnne() {
-        return anne;
-    }
-
-    public void setAnne(Date anne) {
-        this.anne = anne;
-    }
     
 }

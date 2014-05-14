@@ -1,26 +1,44 @@
 package com.jonathan.metier;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class MembreFilm extends Personne{
+public class MembreFilm extends Personne {
 
-      private ArrayList<Film> filmsJoue;
+    private List<Participation> participations;
 
-    public ArrayList<Film> getFilmsJoue() {
-        return filmsJoue;
+    private List<RecompenseFilmDate> recompenses;
+
+    public MembreFilm() {
     }
 
-    public void setFilmsJoue(ArrayList<Film> filmJoue) {
-        this.filmsJoue = filmJoue;
-    }
-    private ArrayList<Recompense> recompense;
-
-    public ArrayList<Recompense> getRecompense() {
-        return recompense;
+    public MembreFilm(List<Participation> participations, List<RecompenseFilmDate> recompenses) {
+        this.participations = participations;
+        this.recompenses = recompenses;
     }
 
-    public void setRecompense(ArrayList<Recompense> recompense) {
-        this.recompense = recompense;
+    public List<Participation> getParticipations() {
+        return participations;
     }
-        
+
+    public void setParticipations(List<Participation> participations) {
+        this.participations = participations;
+    }
+
+    public List<RecompenseFilmDate> getRecompenses() {
+        return recompenses;
+    }
+
+    public void setRecompenses(List<RecompenseFilmDate> recompenses) {
+        this.recompenses = recompenses;
+    }
+
+    
+    public List<RecompenseFilmDate> getRecompense() {
+        return recompenses;
+    }
+
+    public void setRecompense(List<RecompenseFilmDate> recompenses) {
+        this.recompenses = recompenses;
+    }
+
 }
