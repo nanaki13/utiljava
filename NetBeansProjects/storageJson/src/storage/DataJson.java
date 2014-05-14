@@ -35,10 +35,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.jonathan.json.parser.ParserJson;
-import com.jonathan.metier.Acteur;
-import com.jonathan.metier.Film;
-import com.jonathan.metier.Pays;
-import com.jonathan.metier.Realisateur;
+//import com.jonathan.metier.Acteur;
+//import com.jonathan.metier.Film;
+//import com.jonathan.metier.Pays;
+//import com.jonathan.metier.Realisateur;
 
 /**
  *
@@ -191,88 +191,88 @@ public class DataJson {
 
     }
 
-    public static void test() {
-        Film film = new Film(4);
-        film.setSynopsis("un petit film sympas");
-        film.setTitre("l'arnaque");
-        film.addChemin("/jsdjd/");
-        Acteur acteur = new Acteur();
-        acteur.setId(3);
-        acteur.setNom("Newman");
-        acteur.setPrenom("Paul");
-        Acteur acteur2 = new Acteur();
-        acteur2.setId(4);
-        acteur2.setNom("Po");
-        acteur2.setPrenom("bill");
-        Pays p = new Pays();
-        p.setNom("France");
-        p.setId(2);
-        ArrayList<Pays> pays = new ArrayList<>();
-        pays.add(p);
-        Realisateur realisateur = new Realisateur();
-        realisateur.setId(5);
-        ArrayList<Acteur> acteurs = new ArrayList<>();
-        ArrayList<Acteur> acteurs2 = new ArrayList<>();
-        ArrayList<Realisateur> realisateurs = new ArrayList<>();
-        realisateurs.add(realisateur);
-        acteurs.add(acteur);
-        acteurs2.add(acteur);
-        acteurs2.add(acteur2);
-        acteurs2.add(realisateur);
-        film.setActeurs(acteurs);
-        ArrayList<Film> f = new ArrayList<>();
-        LinkedList<Film> lf = new LinkedList<>();
-        for (int i = 0; i < 500; i++) {
-            film = new Film(i);
-            if (i % 2 == 0) {
-                film.setActeurs(acteurs);
-            } else {
-                film.setActeurs(acteurs2);
-            }
-            f.add(film);
-            film.setRealisateurs(realisateurs);
-            film.setDuree(123);
-            film.setSynopsis("un petit film sympas" + i);
-            film.setTitre("l'arnaque");
-            film.setOrigine(p);
-            //    film.setChemin("/jsdjd/");
-            lf.add(film);
-        }
-//        serialise(lf, "filmsLourd");
-        acteur.setFilmsJoue(f);
-        DataJson dataJson = new DataJson();
-        dataJson.serialiseLazy(lf, "films");
-        dataJson.serialiseLazy(pays, "pays");
-        dataJson.serialiseLazy(realisateurs, "realisateurs");
-        dataJson.serialiseLazy(acteurs2, "acteurs");
-
-        List<Pays> ppays = dataJson.deserialise(Pays.class, "pays");
-        List<Acteur> act = dataJson.deserialise(Acteur.class, "acteurs");
-        List<Realisateur> rea = dataJson.deserialise(Realisateur.class, "realisateurs");
-        List<Film> deserialise = dataJson.deserialise(Film.class, "films");
-
-        for (Film fff : deserialise) {
-
-            for (Acteur aacteur : fff.getActeurs()) {
-//                System.out.println(aacteur.getFilmsJoue());
-                if (aacteur.getFilmsJoue() == null) {
-                    aacteur.setFilmsJoue(new ArrayList<Film>());
-                }
-                aacteur.getFilmsJoue().add(fff);
-            }
-        }
-        System.out.println(act.get(1).getFilmsJoue());
-        System.out.println(rea.get(0).getFilmsJoue());
-//        for (Film fff : act.get(0).getFilmsJoue()) {
-//            System.out.println(fff.getTitre());
+//    public static void test() {
+//        Film film = new Film(4);
+//        film.setSynopsis("un petit film sympas");
+//        film.setTitre("l'arnaque");
+//        film.addChemin("/jsdjd/");
+//        Acteur acteur = new Acteur();
+//        acteur.setId(3);
+//        acteur.setNom("Newman");
+//        acteur.setPrenom("Paul");
+//        Acteur acteur2 = new Acteur();
+//        acteur2.setId(4);
+//        acteur2.setNom("Po");
+//        acteur2.setPrenom("bill");
+//        Pays p = new Pays();
+//        p.setNom("France");
+//        p.setId(2);
+//        ArrayList<Pays> pays = new ArrayList<>();
+//        pays.add(p);
+//        Realisateur realisateur = new Realisateur();
+//        realisateur.setId(5);
+//        ArrayList<Acteur> acteurs = new ArrayList<>();
+//        ArrayList<Acteur> acteurs2 = new ArrayList<>();
+//        ArrayList<Realisateur> realisateurs = new ArrayList<>();
+//        realisateurs.add(realisateur);
+//        acteurs.add(acteur);
+//        acteurs2.add(acteur);
+//        acteurs2.add(acteur2);
+//        acteurs2.add(realisateur);
+//        film.setActeurs(acteurs);
+//        ArrayList<Film> f = new ArrayList<>();
+//        LinkedList<Film> lf = new LinkedList<>();
+//        for (int i = 0; i < 500; i++) {
+//            film = new Film(i);
+//            if (i % 2 == 0) {
+//                film.setActeurs(acteurs);
+//            } else {
+//                film.setActeurs(acteurs2);
+//            }
+//            f.add(film);
+//            film.setRealisateurs(realisateurs);
+//            film.setDuree(123);
+//            film.setSynopsis("un petit film sympas" + i);
+//            film.setTitre("l'arnaque");
+//            film.setOrigine(p);
+//            //    film.setChemin("/jsdjd/");
+//            lf.add(film);
 //        }
-
-//        for (Film f : deserialise) {
-        //    System.out.println(f.getId());
-        //    System.out.println(f.getOrigine().getNom());
-        //   System.out.println(f.getDistribution().get(0).getNom());
+////        serialise(lf, "filmsLourd");
+//        acteur.setFilmsJoue(f);
+//        DataJson dataJson = new DataJson();
+//        dataJson.serialiseLazy(lf, "films");
+//        dataJson.serialiseLazy(pays, "pays");
+//        dataJson.serialiseLazy(realisateurs, "realisateurs");
+//        dataJson.serialiseLazy(acteurs2, "acteurs");
+//
+//        List<Pays> ppays = dataJson.deserialise(Pays.class, "pays");
+//        List<Acteur> act = dataJson.deserialise(Acteur.class, "acteurs");
+//        List<Realisateur> rea = dataJson.deserialise(Realisateur.class, "realisateurs");
+//        List<Film> deserialise = dataJson.deserialise(Film.class, "films");
+//
+//        for (Film fff : deserialise) {
+//
+//            for (Acteur aacteur : fff.getActeurs()) {
+////                System.out.println(aacteur.getFilmsJoue());
+//                if (aacteur.getFilmsJoue() == null) {
+//                    aacteur.setFilmsJoue(new ArrayList<Film>());
+//                }
+//                aacteur.getFilmsJoue().add(fff);
+//            }
 //        }
-    }
+//        System.out.println(act.get(1).getFilmsJoue());
+//        System.out.println(rea.get(0).getFilmsJoue());
+////        for (Film fff : act.get(0).getFilmsJoue()) {
+////            System.out.println(fff.getTitre());
+////        }
+//
+////        for (Film f : deserialise) {
+//        //    System.out.println(f.getId());
+//        //    System.out.println(f.getOrigine().getNom());
+//        //   System.out.println(f.getDistribution().get(0).getNom());
+////        }
+//    }
 
     /**
      *

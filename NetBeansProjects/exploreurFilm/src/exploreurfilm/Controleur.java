@@ -18,10 +18,10 @@
 package exploreurfilm;
 
 import com.jonathan.json.parser.ParserJson;
-import com.jonathan.metier.Acteur;
+
 import com.jonathan.metier.Film;
 import com.jonathan.metier.Genre;
-import com.jonathan.metier.Realisateur;
+import com.jonathan.metier.MembreFilm;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -37,15 +37,17 @@ import sun.java2d.loops.CompositeType;
  */
 public class Controleur implements ControleurInterface{
     
-    private List<Genre> genres;
+    private final List<Genre> genres;
     private List<Film> films;
-    private List<Acteur> acteurs;
-    private List<Realisateur> realisateur;
+
+    private final List<MembreFilm> membreFilm;
     private final DataJson dataJson;
     
     public Controleur(){
         dataJson = new DataJson();
         genres = dataJson.deserialise(Genre.class, "genres.json");
+        membreFilm = dataJson.deserialise(MembreFilm.class, "membresFilm.json");
+        films = dataJson.deserialise(Film.class, "films.json");
     }
 
     @Override
@@ -62,13 +64,7 @@ public class Controleur implements ControleurInterface{
         return films;
     }
 
-    public List<Acteur> getActeurs() {
-        return acteurs;
-    }
-
-    public List<Realisateur> getRealisateur() {
-        return realisateur;
-    }
+ 
     
     public static int findFreeId(List<?> objects) {
         if (objects.isEmpty()) {
