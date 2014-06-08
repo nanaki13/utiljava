@@ -4,6 +4,9 @@
  */
 package com.jonathan.json.validator;
 
+import com.jonathan.json.parser.ValidatorChaine;
+import com.jonathan.json.parser.ValidatorAbstract;
+
 /**
  *
  * @author jonathan

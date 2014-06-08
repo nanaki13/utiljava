@@ -12,7 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import storage.DataJson;
-import storage.ObjectReaderException;
+import storage.DataJsonException;
 
 
 /**
@@ -24,7 +24,7 @@ public class Application {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws  ObjectReaderException, IOException {
+    public static void main(String[] args) throws  DataJsonException, IOException {
         Config config = new Config();
         config.setFirstTime(true);
         config.setDataPath("/home/jonathan/trzst");

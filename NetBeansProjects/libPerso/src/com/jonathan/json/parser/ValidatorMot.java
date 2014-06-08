@@ -2,7 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jonathan.json.validator;
+package com.jonathan.json.parser;
+
+import com.jonathan.reader.ReaderCompteur;
+import java.io.IOException;
 
 /**
  *
@@ -13,20 +16,18 @@ class ValidatorMot extends ValidatorAbstract{
 
    
 
-    public ValidatorMot(String input, int indiceDebut) {
-        super(input, indiceDebut);
-        
+
+
+    ValidatorMot(ReaderCompteur rc) {
+        super(rc);
     }
 
     @Override
-    public boolean processValidation() {
-        int i = indiceDebut;
-        char c = input.charAt(i);
-        if(c=='"'){
-            ValidatorAbstract v = new ValidatorChaine(input, indiceDebut);
+    public boolean processValidation() throws IOException {
+
+        if(getLastRead()=='"'){
+            ValidatorAbstract v = new ValidatorChaine(rc);
             valid = v.processValidation();
-            charFin = v.charFin;
-            indiceFin = v.indiceFin;
             if(valid){
                 builder.append(v.builder);
                 return valid;
@@ -35,16 +36,15 @@ class ValidatorMot extends ValidatorAbstract{
                 return valid;
             }
         }
+        char c;
+        builder.append(getLastRead());
         while (true) {
+            c = read();
             if( (c >= a && c<= z) || ( c >= A && c <= Z) || (c >= ZERO && c<= NEUF)||c=='_'){
                 builder.append(c);
-                i++;
-                c = input.charAt(i);
             }
             else{
                     valid =true;
-                    indiceFin = i;
-                    charFin = c;
                     return valid;
             }
         }

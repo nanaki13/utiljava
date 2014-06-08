@@ -4,6 +4,10 @@
  */
 package com.jonathan.json.validator;
 
+import com.jonathan.json.parser.ValidatorMot;
+import com.jonathan.json.parser.FinderValidator;
+import com.jonathan.json.parser.ValidatorException;
+import com.jonathan.json.parser.ValidatorAbstract;
 import com.jonathan.json.ArrayJson;
 import com.jonathan.json.JsonObject;
 import com.jonathan.json.NumberJson;
@@ -83,7 +87,7 @@ public class ValidatorObjet extends ValidatorAbstract {
                 System.out.println("key : "+key);
                 validator = new ValidatorWhite(input, validatorMot.getIndiceFin());
                 validator.processValidation();
-                if (validator.getCharFin() == ':') {
+                if (validator.getLastRead() == ':') {
                     validator = new ValidatorWhite(input, validator.getIndiceFin() + 1);
                     validator.processValidation();
                     charFin = validator.charFin;
@@ -103,7 +107,7 @@ public class ValidatorObjet extends ValidatorAbstract {
                     jsonObject.put(key, validator.joi);
                     validator = new ValidatorWhite(input, validator.getIndiceFin());
                     validator.processValidation();
-                    c = validator.getCharFin();
+                    c = validator.getLastRead();
                     if (c == ',') {
                         i = validator.getIndiceFin() + 1;
                     } else if (c == '}') {

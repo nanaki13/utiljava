@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package exploreurfilm;
 
 import java.awt.Color;
@@ -28,46 +27,46 @@ import com.jonathan.lib.string.StringTool;
  *
  * @author jonathan
  */
-public class StringCellRender extends JLabel implements ListCellRenderer<Object>{
-    
-    public StringCellRender(){
+public class StringCellRender extends JLabel implements ListCellRenderer<Object> {
+
+    public StringCellRender() {
         setOpaque(true);
     }
+
     @Override
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-       
+
         String text = StringTool.take(value.toString(), '/', '.');
-      //  StringTool.raccourci(value.toString(), 15 , StringTool.LEFT);
+        //  StringTool.raccourci(value.toString(), 15 , StringTool.LEFT);
         setText(text);
         setToolTipText(value.toString());
-         Color background;
-         Color foreground;
+        Color background;
+        Color foreground;
 
-         // check if this cell represents the current DnD drop location
-         JList.DropLocation dropLocation = list.getDropLocation();
-         if (dropLocation != null
-                 && !dropLocation.isInsert()
-                 && dropLocation.getIndex() == index) {
+        // check if this cell represents the current DnD drop location
+        JList.DropLocation dropLocation = list.getDropLocation();
+        if (dropLocation != null
+                && !dropLocation.isInsert()
+                && dropLocation.getIndex() == index) {
 
-             background = Color.BLUE;
-             foreground = Color.WHITE;
+            background = Color.BLUE;
+            foreground = Color.WHITE;
 
-         // check if this cell is selected
-         } else if (isSelected) {
-             background = Color.RED;
-             foreground = Color.WHITE;
+            // check if this cell is selected
+        } else if (isSelected) {
+            background = Color.RED;
+            foreground = Color.WHITE;
 
-         // unselected, and not the DnD drop location
-         } else {
-             background = Color.WHITE;
-             foreground = Color.BLACK;
-         }
+            // unselected, and not the DnD drop location
+        } else {
+            background = Color.WHITE;
+            foreground = Color.BLACK;
+        }
 
-         setBackground(background);
-         setForeground(foreground);
+        setBackground(background);
+        setForeground(foreground);
 
-         return this;
-     }
+        return this;
     }
     
-
+}

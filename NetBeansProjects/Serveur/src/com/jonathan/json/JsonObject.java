@@ -4,7 +4,7 @@
  */
 package com.jonathan.json;
 
-import com.jonathan.json.validator.ValidatorException;
+import com.jonathan.json.parser.ValidatorException;
 import parser.ParserJson;
 import java.math.BigDecimal;
 import java.util.HashMap;

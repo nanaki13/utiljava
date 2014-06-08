@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jonathan.json.validator;
+package com.jonathan.json.parser;
 
 /**
  *

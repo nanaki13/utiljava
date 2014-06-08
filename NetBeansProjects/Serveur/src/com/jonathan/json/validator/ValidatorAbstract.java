@@ -4,6 +4,7 @@
  */
 package com.jonathan.json.validator;
 
+import com.jonathan.json.parser.ValidatorException;
 import com.jonathan.json.JsonObjectInterface;
 
 /**
@@ -47,7 +48,7 @@ abstract class ValidatorAbstract implements Validator{
         return indiceFin;
     }
 
-   public char getCharFin(){
+   public char getLastRead(){
         return charFin;
     }
    public String getError(){

@@ -4,6 +4,8 @@
  */
 package com.jonathan.json.validator;
 
+import com.jonathan.json.parser.FinderValidator;
+import com.jonathan.json.parser.ValidatorAbstract;
 import com.jonathan.json.ArrayJson;
 
 /**

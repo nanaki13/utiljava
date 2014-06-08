@@ -4,9 +4,11 @@
  * and open the template in the editor.
  */
 
-package com.jonathan.json.validator;
+package com.jonathan.json.parser;
 
 import com.jonathan.json.JsonNull;
+import com.jonathan.reader.ReaderCompteur;
+import java.io.IOException;
 
 /**
  *
@@ -14,16 +16,17 @@ import com.jonathan.json.JsonNull;
  */
 class ValidatorNull extends ValidatorAbstract {
 
-    public ValidatorNull(String input, int indiceDebut) {
-         super(input, indiceDebut);
+    public ValidatorNull(ReaderCompteur rc) {
+         super(rc);
     }
 
     @Override
-    public boolean processValidation()  {
-        if(input.substring(indiceDebut, indiceDebut+4).equals("null")){
+    public boolean processValidation() throws IOException  {
+        char[] buff = new char[3]; 
+        rc.read(buff, 0, 3);
+        if(('n'+(new String(buff))).equals("null")){
             joi = JsonNull.NULL;
-            indiceFin = indiceDebut + 4;
-            charFin = input.charAt(indiceFin);
+            readIfNotRoot();
             return true;
         }
         else{

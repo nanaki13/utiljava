@@ -4,13 +4,14 @@
  */
 package com.jonathan.json;
 
-import com.jonathan.json.validator.ValidatorException;
+import com.jonathan.json.parser.ValidatorException;
 import com.jonathan.json.parser.ParserJson;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import com.jonathan.lib.string.StringTool;
+import java.io.IOException;
 
 /**
  *
@@ -25,7 +26,7 @@ public class JsonObject implements JsonObjectInterface {
         this.textEncloser = textEncloser;
     }
 
-    public static void main(String[] args) throws ValidatorException {
+    public static void main(String[] args) throws ValidatorException, IOException {
         JsonObject jo = new JsonObject();
         JsonObject jo2 = new JsonObject();
         jo2.put("bli", "fkdjfnkdvf\n sdc\"b'sidc'bs\\");
@@ -40,7 +41,7 @@ public class JsonObject implements JsonObjectInterface {
         jo.guillemetOnKey = true;
         System.out.println(jo.toStringJsonPretty());
         ParserJson parserJson = new ParserJson(jo.toStringJsonPretty());
-        JsonObject parse = parserJson.parse();
+        JsonObject parse = (JsonObject)parserJson.parse();
         parse.setGuillemetOnKey(true);
         parse.setTextEncloser('\"');
         System.out.println(parse.toStringJsonPretty());

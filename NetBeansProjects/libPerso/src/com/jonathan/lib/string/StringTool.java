@@ -5,8 +5,10 @@
  */
 package com.jonathan.lib.string;
 
+import com.jonathan.reader.ReaderCompteur;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -237,6 +239,57 @@ public class StringTool {
         return builder.toString();
     }
     
+     /**
+     * Remplace les chaines \n, \t, ... par les vrais.
+     * @param reader
+     * @return la chaine avec les char remplacés
+     * @throws java.io.IOException
+     */
+    public static String replaceEscapeCharByTrueChar(ReaderCompteur reader) throws IOException {
+        if (reader == null) {
+            throw new NullPointerException("reader is null");
+        }
+        char opener = reader.getLastRead();
+        StringBuilder builder = new StringBuilder();
+        int i= reader.read();
+        while (i != -1 && i != opener) {
+            if (i == '\\') {
+                i= reader.read();
+                if (i != -1 ) {
+                    throw new IOException("fin du flux");
+                } else {
+                    switch (i) {
+                        case 'r':
+                            builder.append('\r');
+                            break;
+                        case 't':
+                            builder.append('\t');
+                            break;
+                        case 'n':
+                            builder.append('\n');
+                            break;
+                        case 'b':
+                            builder.append('\b');
+                            break;
+                        case '\\':
+                            builder.append('\\');
+                            break;
+                        case 'f':
+                            builder.append('\f');
+                            break;
+                        default:
+                            builder.append((char) i);
+                    }
+                }
+            }
+            else{
+                builder.append((char) i);
+            }
+            i= reader.read();
+        }
+        return builder.toString();
+    }
+    
     public static int nextNonWhite(final String in, int start){
         char c= in.charAt(start);
         while (true) {            
@@ -250,7 +303,7 @@ public class StringTool {
             }
         }
     }
-    public static void nextNonWhite(final InputStreamReader in) throws IOException{
+    public static void nextNonWhite(final Reader in) throws IOException{
 
         char c  = lastChar;
         while ((c =  (char)in.read())!=-1) {
@@ -262,7 +315,7 @@ public class StringTool {
             else return;
         }
     }
-    public static String nextNombre(final InputStreamReader in) throws IOException{
+    public static String nextNombre(final Reader in) throws IOException{
 
         char c ;
         StringBuilder b = new StringBuilder();
@@ -329,6 +382,7 @@ public class StringTool {
         }
         return i;
     }
+
     
      public static void main(String[] args) {
          String s = "      \"zbbb\\\"bq\\\"\\nsdqsce nbb\\cbz\"           ";

@@ -12,7 +12,7 @@ import com.jonathan.json.JsonObjectInterface;
 import com.jonathan.json.NumberJson;
 import com.jonathan.json.TextJson;
 import com.jonathan.json.TypeJson;
-import com.jonathan.json.validator.ValidatorException;
+import com.jonathan.json.parser.ValidatorException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.jonathan.json.parser.ParserJson;
+import java.io.FileNotFoundException;
 //import com.jonathan.metier.Acteur;
 //import com.jonathan.metier.Film;
 //import com.jonathan.metier.Pays;
@@ -49,7 +50,7 @@ public class DataJson {
     private static final String get = "get";
     private static final String set = "set";
 
-    public static void main(String[] a) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, ObjectReaderException {
+    public static void main(String[] a) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, DataJsonException {
         test2();
 
 //        test();
@@ -63,19 +64,23 @@ public class DataJson {
             try (FileWriter fw = new FileWriter(f)) {
                 fw.write(objectToJsonObject.toStringJson());
             }
-        } catch (ObjectReaderException | IOException ex) {
+        } catch (DataJsonException | IOException ex) {
             Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public static <T> T FileToObject(Class<T> aClass, String file) {
+    public static <T> T FileToObject(Class<T> aClass, String file) throws DataJsonException {
         try {
-            JsonObject fileToOneJson = Storage.fileToOneJson(new File(file));
-            return deserialiseOneObject(aClass, fileToOneJson);
-        } catch (ObjectReaderException ex) {
-            Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
+            ParserJson pj;
+            pj = new ParserJson(new File(file));
+            JsonObjectInterface parse;
+            parse = pj.parse();
+//            JsonObject fileToOneJson = Storage.fileToOneJson(new File(file));
+            return deserialiseOneObject(aClass, parse);
+        } catch ( ValidatorException | DataJsonException | IOException ex) {
+            throw new DataJsonException( ex);
         }
-        return null;
+
     }
 
     public void clearCacheDeserealisation() {
@@ -149,7 +154,7 @@ public class DataJson {
 
     }
 
-    public static void test2() throws ObjectReaderException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+    public static void test2() throws DataJsonException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
         JsonObject jo = new JsonObject();
         jo.put("string", "balzla");
         jo.put("nb", 123);
@@ -304,10 +309,10 @@ public class DataJson {
         return superTmp;
     }
 
-    public Map<Class, Map<Integer, Object>> cacheObject = new HashMap<>();
-    public Set<Object> objectsDejaSerealise = new HashSet<>();
+    private final Map<Class, Map<Integer, Object>> cacheObject = new HashMap<>();
+    private final Set<Object> objectsDejaSerealise = new HashSet<>();
 
-    public <T> List<T> deserialise(Class<T> c, String file) {
+    public <T> List<T> deserialise(Class<T> c, String file) throws DataJsonException {
         ArrayList<T> ar;
         ar = new ArrayList<>();
         Map<Integer, Object> mapDeC ;
@@ -322,11 +327,14 @@ public class DataJson {
         }
 
         try {
-            Collection<JsonObject> values = Storage.fileToSetJson(new File(file));
+            ParserJson pj = new ParserJson(new File(file));
+            ArrayJson aj = (ArrayJson) pj.parse();
+            List<JsonObjectInterface> jsonObjects = aj.getJsonObjects();
+//            Collection<JsonObject> values = Storage.fileToSetJson(new File(file));
             Method[] methods = c.getMethods();
-            for (JsonObject jo : values) {
+            for (JsonObjectInterface joi : jsonObjects) {
                 Method method = null;
-
+                JsonObject jo = (JsonObject) joi;
                 Object[] param = new Object[1];
                 Object newInstance = c.newInstance();
                 Set<String> keys = jo.getKeys();
@@ -416,13 +424,20 @@ public class DataJson {
 
             }
 
-        } catch (ObjectReaderException | InstantiationException | IllegalAccessException | SecurityException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( InstantiationException | 
+                IllegalAccessException | 
+                SecurityException | 
+                NoSuchMethodException | 
+                IllegalArgumentException | 
+                IOException | 
+                ValidatorException |
+                InvocationTargetException ex) {
+            throw new DataJsonException(ex);
         }
         return ar;
     }
 
-    public static <T> T deserialiseOneObject(Class<T> clazz, JsonObjectInterface jo) throws ObjectReaderException {
+    public static <T> T deserialiseOneObject(Class<T> clazz, JsonObjectInterface jo) throws DataJsonException {
         Method[] methods = clazz.getMethods();
         Method method;
         Object[] param = new Object[1];
@@ -482,10 +497,8 @@ public class DataJson {
 
                     method.invoke(newInstance, param);
                 }
-            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
-                throw new ObjectReaderException(ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException | ClassNotFoundException ex) {
+                throw new DataJsonException(ex);
             }
         } else if (jo.getType() == TypeJson.TEXT) {
             newInstance = ((TextJson) jo).getValue();
@@ -507,9 +520,9 @@ public class DataJson {
         return clazz.cast(newInstance);
     }
 
-    public <T> T deserialiseOneObject(Class<T> c, String file) throws ObjectReaderException, ValidatorException {
+    public <T> T deserialiseOneObject(Class<T> c, String file) throws DataJsonException, FileNotFoundException, IOException, ValidatorException  {
 
-        JsonObject jo = new ParserJson(new File(file)).parse();
+        JsonObjectInterface jo = new ParserJson(new File(file)).parse();
         return deserialiseOneObject(c, jo);
 
     }
@@ -568,14 +581,16 @@ public class DataJson {
      *
      * @param objects
      * @param file
+     * @throws storage.DataJsonException
      */
-    public void serialise(Collection<?> objects, String file) {
-        FileWriter fw = null;
+    public void serialise(Collection<?> objects, String file) throws DataJsonException {
+        FileWriter fw;
         try {
 
             Iterator<?> iterator = objects.iterator();
             fw = new FileWriter(file);
             try (BufferedWriter bw = new BufferedWriter(fw)) {
+                bw.append('[');
                 while (iterator.hasNext()) {
                     bw.append(objectToJsonObject(iterator.next()).toStringJson());
                     if (iterator.hasNext()) {
@@ -583,12 +598,11 @@ public class DataJson {
                     }
                     bw.append('\n');
                 }
+                bw.append(']');
                 bw.flush();
-            } catch (ObjectReaderException ex) {
-                Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            } 
         } catch (IOException ex) {
-            Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
+            throw new DataJsonException(ex);
         }
     }
 
@@ -749,7 +763,7 @@ public class DataJson {
         return jo;
     }
 
-    public static JsonObjectInterface objectToJsonObject(Object o) throws ObjectReaderException {
+    public static JsonObjectInterface objectToJsonObject(Object o) throws DataJsonException {
 
         Class<? extends Object> aClass = o.getClass();
         if (aClass.equals(Integer.class)) {
@@ -863,7 +877,7 @@ public class DataJson {
                 }
             }
         } catch (Exception e) {
-            throw new ObjectReaderException(e);
+            throw new DataJsonException(e);
         }
 
         return jo;

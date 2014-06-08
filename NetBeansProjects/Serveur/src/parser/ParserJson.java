@@ -5,8 +5,8 @@
 package parser;
 
 import com.jonathan.json.JsonObject;
-import com.jonathan.json.validator.ValidatorException;
-import com.jonathan.json.validator.ValidatorObjet;
+import com.jonathan.json.parser.ValidatorException;
+import com.jonathan.json.parser.ValidatorObjet;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -50,7 +50,7 @@ public class ParserJson {
             return v.getJsonObject();
         }else{
             throw new ValidatorException("erreur durant le parsing : "+v.getError()
-                    + " sur le caractère : "+v.getCharFin());
+                    + " sur le caractère : "+v.getLastRead());
         }
         
     }

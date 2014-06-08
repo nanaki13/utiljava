@@ -6,6 +6,7 @@
 
 package com.jonathan.json.validator;
 
+import com.jonathan.json.parser.ValidatorAbstract;
 import com.jonathan.json.BooleanJson;
 
 /**

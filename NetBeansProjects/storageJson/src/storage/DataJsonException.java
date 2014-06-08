@@ -8,21 +8,21 @@ package storage;
  *
  * @author jonathan
  */
-public class ObjectReaderException extends Exception {
+public class DataJsonException extends Exception {
 
-    public ObjectReaderException(String msg) {
+    public DataJsonException(String msg) {
         super(msg);
     }
 
-    public ObjectReaderException() {
+    public DataJsonException() {
     }
 
 
-    public ObjectReaderException(String message, Throwable cause) {
+    public DataJsonException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ObjectReaderException(Throwable cause) {
+    public DataJsonException(Throwable cause) {
         super(cause);
     }
 

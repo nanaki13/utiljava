@@ -4,6 +4,8 @@
  */
 package com.jonathan.json.validator;
 
+import com.jonathan.json.parser.ValidatorException;
+
 /**
  *
  * @author jonathan

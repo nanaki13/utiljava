@@ -2,9 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jonathan.json.validator;
+package com.jonathan.json.parser;
 
 import com.jonathan.json.NumberJson;
+import com.jonathan.reader.ReaderCompteur;
+import java.io.IOException;
 
 /**
  *
@@ -15,25 +17,27 @@ class ValidatorNombre extends ValidatorAbstract{
 
    
 
-    public ValidatorNombre(String input, int indiceDebut) {
-        super(input, indiceDebut);
+    public ValidatorNombre(ReaderCompteur rc) {
+        super(rc);
         
     }
 
   
 
     @Override
-    public boolean processValidation() {
-        int i = indiceDebut;
+    public boolean processValidation() throws IOException {
+ 
         boolean pointRenconter=false;
-        char c = input.charAt(i);
+        char c = getLastRead();
+        if(c == '-'){
+            builder.append('-');
+            c = read();
+        }
         boolean continu  = true;
         while (continu) {
             if( (c >= ZERO && c<= NEUF)){
-                i++;
                 builder.append(c);
-                c = input.charAt(i);
-                
+                c = read();    
             }
             else if(c==POINT ){
                 if(!pointRenconter){
@@ -43,20 +47,15 @@ class ValidatorNombre extends ValidatorAbstract{
                 else{
                     valid = false;
                     error="un point en trop";
-                    indiceFin = i;
-                    charFin = c;
                     return valid;
                 } 
-                 i++;
-                 c = input.charAt(i);
+                 c = read();    
             }
             else{
                 continu = false;
             }
         }
         valid = true;
-        indiceFin = i;
-        charFin = c;
         joi = new NumberJson(builder.toString());
         return valid;
     }

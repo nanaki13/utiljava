@@ -5,6 +5,14 @@
  */
 package com.jonathan.json.validator;
 
+import com.jonathan.json.parser.ValidatorChaine;
+import com.jonathan.json.parser.ValidatorNull;
+import com.jonathan.json.parser.ValidatorArray;
+import com.jonathan.json.parser.ValidatorBoolean;
+import com.jonathan.json.parser.ValidatorAbstract;
+import com.jonathan.json.parser.ValidatorNombre;
+import com.jonathan.json.parser.ValidatorObjet;
+
 /**
  *
  * @author jonathan
@@ -12,7 +20,7 @@ package com.jonathan.json.validator;
 public class FinderValidator {
 
     public static ValidatorAbstract getGoodValidator(ValidatorAbstract validatorIn) {
-        char decideur = validatorIn.getCharFin();
+        char decideur = validatorIn.getLastRead();
         int i = validatorIn.getIndiceFin();
         String input = validatorIn.getInput();
         ValidatorAbstract validator = null;
