@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import storage.DataJson;
+import storage.DataJsonException;
 import sun.java2d.loops.CompositeType;
 
 /**
@@ -43,7 +44,7 @@ public class Controleur implements ControleurInterface{
     private final List<MembreFilm> membreFilm;
     private final DataJson dataJson;
     
-    public Controleur(){
+    public Controleur() throws DataJsonException{
         dataJson = new DataJson();
         genres = dataJson.deserialise(Genre.class, "genres.json");
         membreFilm = dataJson.deserialise(MembreFilm.class, "membresFilm.json");

@@ -54,7 +54,7 @@ public class CsvReader {
                     if (read == '\\') {
                         read = rc.read();
                     } else if (read == -1) {
-                        throw new IOException("string open but not close : " + rc.getNbCharDeLigne() + "," + rc.getNbCharDeLigne());
+                        throw new IOException("string open but not close : " + rc.getNbLigne() + "," + rc.getNbCharDeLigne());
                     }
                 }
                 read = rc.read();
@@ -82,7 +82,7 @@ public class CsvReader {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        String csv = "\"bla\nbla\";12345\n"
+        String csv = "\"bla\nbla\";\"12345\"\n"
                 + "\"bla\nbla\";12345;\"salut\"\n"
                 + "\"bla\nbla\";;12345\n"
                 + "\"bla\nbla\";12345\n"

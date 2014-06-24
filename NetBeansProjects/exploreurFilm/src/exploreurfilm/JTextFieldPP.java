@@ -31,17 +31,13 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JComboBox;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.Popup;
-import javax.swing.PopupFactory;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
@@ -54,13 +50,16 @@ import javax.swing.text.Document;
 public class JTextFieldPP<T> extends JTextField implements KeyListener, MouseListener, ActionListener {
 
     private final Collection<T> objects;
-    private ChooserText<T> chooser;
+    private final ChooserText<T> chooser;
     private Comparator<T> comparator;
     private StringMaker<T> stringMaker;
-//    private JComboBox<T> jComboBox = new JComboBox<T>();
+    private String lastEntry = null;
+    private Collection<T> lastObjects;
+    private JScrollPane jScrollPane = new JScrollPane();
     private T selected;
     private JPopupMenu jPopupMenu;
     private boolean noWait = true;
+    private final JList<T> jl = new JList<T>();
     private final Object lock = new Object();
 
     public void setComparator(Comparator<T> comparator) {
@@ -128,44 +127,79 @@ public class JTextFieldPP<T> extends JTextField implements KeyListener, MouseLis
                             }
                             noWait = true;
                             String text = getText();
+
                             chooser.setText(text);
-                            List<T> choosen = Chooser.chooseAndOrder(objects, chooser, comparator);
+                            Collection<T> forChoice;
+                            if (lastEntry != null && !lastEntry.isEmpty() && text.contains(lastEntry)) {
+                                forChoice = lastObjects;
+                                System.out.println("sur les derniers");
+                            } else {
+                                System.out.println("sur tout");
+                                forChoice = objects;
+                            }
+                            lastEntry = text;
+                            List<T> choosen = Chooser.chooseAndOrder(forChoice, chooser, comparator);
+                            lastObjects = choosen;
+//                            jPopupMenu.removeAll();
 
-                            jPopupMenu.removeAll();
+                            final Vector<T> vDeT = new Vector<>(choosen);
+//                                final JList<T> jl = new JList<>(vDeT);
+                            AbstractListModel<T> defaultListModel = new AbstractListModel<T>() {
 
-                                Vector<T> vDeT = new Vector<>(choosen);
-                                final JList<T> jl = new JList<>(vDeT);
-
-                                ListCellRenderer<T> listCellRenderer = new ListCellRenderer<>(stringMaker);
-                                jl.setCellRenderer(listCellRenderer);
-                                jl.addMouseMotionListener(listCellRenderer.getHandler(jl));
-                                jl.addListSelectionListener( new ListSelectionListener() {
-
-                                    @Override
-                                    public void valueChanged(ListSelectionEvent e) {
-                                        JTextFieldPP.this.setText(stringMaker.buildString(jl.getSelectedValue()));
-                                        jPopupMenu.setVisible(false);
-                                    }
-                                });                 
-                                if(vDeT.size()<10){
-                                    jPopupMenu.add(jl);
-                                }else{
-                                    JScrollPane jScrollPane = new JScrollPane(jl);
-                                    jScrollPane.setPreferredSize(new Dimension(getSize().width, 10 * 10));
-                                    jPopupMenu.add(jScrollPane);
+                                @Override
+                                public int getSize() {
+                                    return vDeT.size();
                                 }
-                                
-//                            }
 
+                                @Override
+                                public T getElementAt(int index) {
+                                    return vDeT.elementAt(index);
+                                }
+                            };
+                            jl.setModel(defaultListModel);
+
+                            ListCellRenderer<T> listCellRenderer = new ListCellRenderer<>(stringMaker);
+                            jl.setCellRenderer(listCellRenderer);
+                            jl.addMouseMotionListener(listCellRenderer.getHandler(jl));
+                            jl.addListSelectionListener(new ListSelectionListener() {
+
+                                @Override
+                                public void valueChanged(ListSelectionEvent e) {
+                                    JTextFieldPP.this.setText(stringMaker.buildString(jl.getSelectedValue()));
+                                    jPopupMenu.setVisible(false);
+                                }
+                            });
+                            if (/*vDeT.size()<10*/false) {
+                                jPopupMenu.add(jl);
+                            } else {
+
+//                                    jScrollPane = new JScrollPane(jl);
+//                                    jl.validate();
+                                System.out.println(jl.getSize());
+                                System.out.println(jl.getPreferredSize());
+                                int height = jl.getPreferredSize().height;
+                                Dimension dScrollPane;
+                                if (height <= 100) {
+                                    dScrollPane = new Dimension(jl.getPreferredSize().width + 20, jl.getPreferredSize().height + 5);
+                                } else {
+                                    dScrollPane = new Dimension(jl.getPreferredSize().width + 20, 100);
+                                }
+
+                                jScrollPane.setPreferredSize(dScrollPane);
+                                jPopupMenu.add(jScrollPane);
+                            }
+
+//                            }
                             if (!choosen.isEmpty()) {
+                                jPopupMenu.pack();
+//                            jPopupMenu.revalidate();
+                                jPopupMenu.repaint();
                                 jPopupMenu.show(JTextFieldPP.this, 0, getSize().height);
-                                grabFocus();
+
                             } else {
                                 jPopupMenu.setVisible(false);
                             }
-                            jPopupMenu.pack();
-                            jPopupMenu.revalidate();
-                            jPopupMenu.repaint();
+
                         }
                     }
                 });
@@ -207,6 +241,11 @@ public class JTextFieldPP<T> extends JTextField implements KeyListener, MouseLis
     private void init() {
         addKeyListener(this);
         jPopupMenu = new JPopupMenu();
+        jScrollPane.setViewportView(jl);
+        jPopupMenu.add(jScrollPane);
+        jPopupMenu.setFocusable(false);
+//        jl.setFocusable(false);
+//        jScrollPane.setFocusable(false);
         this.setComponentPopupMenu(jPopupMenu);
         jPopupMenu.addMouseListener(this);
 //        this.add(jComboBox);
