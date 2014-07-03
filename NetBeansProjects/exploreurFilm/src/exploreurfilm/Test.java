@@ -17,6 +17,7 @@
 
 package exploreurfilm;
 
+import exploreurfilm.vue.JTextFieldPP;
 import com.jonathan.lib.collections.ChooserText;
 import com.jonathan.metier.Pays;
 import java.util.ArrayList;

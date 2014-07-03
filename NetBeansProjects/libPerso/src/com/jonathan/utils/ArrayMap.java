@@ -21,8 +21,8 @@ import java.util.Set;
  */
 public class ArrayMap<T, U>  implements Map<T, U> {
 
-    private List<U> values;
-    private List<T> keys;
+    private final List<U> values;
+    private final  List<T> keys;
 
     public ArrayMap() {
         values = new ArrayList<>();

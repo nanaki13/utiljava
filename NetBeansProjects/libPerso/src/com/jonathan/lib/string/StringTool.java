@@ -134,7 +134,7 @@ public class StringTool {
         if (str == null) {
             throw new NullPointerException("str is null");
         }
-
+//        System.out.println(str +" "+start+" "+stop);
         StringBuilder builder = new StringBuilder(stop - start);
         int i = start;
         while (i != stop + 1) {
@@ -179,6 +179,8 @@ public class StringTool {
     }
     
      public static String echapeInvisibleChar(String str , char ... charList) {
+         if(str.isEmpty())
+             return "";
        String ret = echapeInvisibleChar(str, 0, str.length() - 1);
        ret = addcslashes(ret, charList);
        return ret;

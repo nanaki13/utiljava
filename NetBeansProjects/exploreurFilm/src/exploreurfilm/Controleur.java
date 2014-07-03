@@ -17,11 +17,15 @@
 
 package exploreurfilm;
 
+import exploreurfilm.vue.ExploreurFilm;
 import com.jonathan.json.parser.ParserJson;
 
 import com.jonathan.metier.Film;
 import com.jonathan.metier.Genre;
 import com.jonathan.metier.MembreFilm;
+import com.jonathan.metier.Metier;
+import com.jonathan.metier.Pays;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -40,6 +44,9 @@ public class Controleur implements ControleurInterface{
     
     private final List<Genre> genres;
     private List<Film> films;
+    private List<Metier> metiers;
+    private List<Pays> pays;
+    private ExploreurFilm exploreurFilm;
 
     private final List<MembreFilm> membreFilm;
     private final DataJson dataJson;
@@ -47,6 +54,8 @@ public class Controleur implements ControleurInterface{
     public Controleur() throws DataJsonException{
         dataJson = new DataJson();
         genres = dataJson.deserialise(Genre.class, "genres.json");
+        metiers = dataJson.deserialise(Metier.class, "metiers.json");
+        pays = dataJson.deserialise(Pays.class, "pays.json");
         membreFilm = dataJson.deserialise(MembreFilm.class, "membresFilm.json");
         films = dataJson.deserialise(Film.class, "films.json");
     }
@@ -54,6 +63,10 @@ public class Controleur implements ControleurInterface{
     @Override
     public void exit() {
         dataJson.serialiseLazy(genres, "genres.json");
+        dataJson.serialiseLazy(metiers, "metiers.json");
+        dataJson.serialiseLazy(pays, "pays.json");
+        dataJson.serialiseLazy(films, "films.json");
+        
         System.exit(0);
     }
 
@@ -65,6 +78,19 @@ public class Controleur implements ControleurInterface{
         return films;
     }
 
+    public List<Metier> getMetiers() {
+        return metiers;
+    }
+
+    public List<Pays> getPays() {
+        return pays;
+    }
+
+    public List<MembreFilm> getMembreFilm() {
+        return membreFilm;
+    }
+
+    
  
     
     public static int findFreeId(List<?> objects) {
@@ -74,17 +100,25 @@ public class Controleur implements ControleurInterface{
             try {
                 int idBefore = -1;
                 int idCandidat = -1;
+                Object ret;
                 Method methodGet = objects.get(0).getClass().getMethod("getId", (Class<?>[]) null);
                 System.out.println(methodGet.getParameterTypes());
                 for (Object o : objects) {
-                    idCandidat = (int) methodGet.invoke(o, (Object[]) null);
+                    ret = methodGet.invoke(o, (Object[]) null);
+                    
+                    if(ret instanceof Integer)
+                        idCandidat = (Integer) ret;
+                    else if(Integer.TYPE.isInstance(o))
+                        idCandidat = (int) ret;
                     if (idBefore == -1) {
                         idBefore = idCandidat;
                     }
                     idCandidat = Math.max(idCandidat, idBefore);
                     
                 }
-                return ++idCandidat;
+                idCandidat++;
+                System.out.println("idCandidat : "+idCandidat);
+                return idCandidat;
             } catch (    NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(Controleur.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -97,6 +131,20 @@ public class Controleur implements ControleurInterface{
         List<Genre> l = new ArrayList<>();
         l.add(g);
         System.out.println(findFreeId(l));
+    }
+    
+    public void newFilm(Film f){
+        if(f.getId() == null){
+             int findFreeId = findFreeId(films);
+             f.setId(findFreeId);
+             films.add(f);
+        }
+        exploreurFilm.doEndFilmImport();
+        
+    }
+
+    public void setExploreurFilm(ExploreurFilm exploreurFilm) {
+        this.exploreurFilm = exploreurFilm;
     }
     
     

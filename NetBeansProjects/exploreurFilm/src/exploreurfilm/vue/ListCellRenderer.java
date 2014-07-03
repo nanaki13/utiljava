@@ -22,8 +22,9 @@
  *
  *
  */
-package exploreurfilm;
+package exploreurfilm.vue;
 
+import exploreurfilm.StringMaker;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
@@ -141,15 +142,14 @@ public class ListCellRenderer<T> extends JLabel
             setBackground(bg == null ? list.getSelectionBackground() : bg);
             setForeground(fg == null ? list.getSelectionForeground() : fg);
         } else {
-            if(hoverIndex!=index){
-                  setBackground(list.getBackground());
-                  setForeground(list.getForeground());
-            }
-            else{
+            if (hoverIndex != index) {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            } else {
                 setBackground(bg == null ? list.getSelectionBackground() : bg);
                 setForeground(fg == null ? list.getSelectionForeground() : fg);
             }
-          
+
         }
 
         if (value instanceof Icon) {
@@ -291,12 +291,11 @@ public class ListCellRenderer<T> extends JLabel
         }
         return handler;
     }
-private int hoverIndex = -1;
+    private int hoverIndex = -1;
+
     class HoverMouseHandler extends MouseAdapter {
 
         private final JList list;
-        
-        
 
         public HoverMouseHandler(JList list) {
             this.list = list;

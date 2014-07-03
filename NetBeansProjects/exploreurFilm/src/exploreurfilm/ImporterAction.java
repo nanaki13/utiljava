@@ -17,6 +17,7 @@
 
 package exploreurfilm;
 
+import exploreurfilm.vue.ExploreurFilm;
 import static exploreurfilm.SystemProprietes.USER_HOME;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,7 +42,7 @@ public class ImporterAction implements ActionListener{
 
  
 
-    ImporterAction(ExploreurFilm exploreurFilm) {
+    public ImporterAction(ExploreurFilm exploreurFilm) {
         this.filmPathCol = new ArrayList<>();
         this.exploreurFilm = exploreurFilm;
     }

@@ -213,6 +213,12 @@ public class JsonObject implements JsonObjectInterface {
     public JsonObject put(String key, float value) {
         return put(key, new NumberJson(value));
     }
+    public JsonObject put(String key, long value) {
+        return put(key, new NumberJson(value));
+    }
+    public JsonObject put(String key, char value) {
+        return put(key, new TextJson(String.valueOf(value)));
+    }
 
     public JsonObject put(String key, boolean value) {
         if (value == true) {

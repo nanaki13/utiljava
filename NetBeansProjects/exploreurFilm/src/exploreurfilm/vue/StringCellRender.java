@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package exploreurfilm;
+package exploreurfilm.vue;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -49,18 +49,18 @@ public class StringCellRender extends JLabel implements ListCellRenderer<Object>
                 && !dropLocation.isInsert()
                 && dropLocation.getIndex() == index) {
 
-            background = Color.BLUE;
-            foreground = Color.WHITE;
+            background = list.getSelectionBackground();
+            foreground = list.getSelectionForeground();
 
             // check if this cell is selected
         } else if (isSelected) {
-            background = Color.RED;
-            foreground = Color.WHITE;
+            background = list.getSelectionBackground();
+            foreground = list.getSelectionForeground();
 
             // unselected, and not the DnD drop location
         } else {
-            background = Color.WHITE;
-            foreground = Color.BLACK;
+            background = list.getBackground();
+            foreground = list.getForeground();
         }
 
         setBackground(background);

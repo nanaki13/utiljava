@@ -25,8 +25,12 @@ class ValidatorArray extends ValidatorAbstract {
         ArrayJson aj = new ArrayJson();
         joi = new ArrayJson();
         char c;
+        readNextNoWhite();
+        if(getLastRead() == ']'){
+            return true;
+        }
         while (true) {
-            readNextNoWhite();
+            
             validator = FinderValidator.getGoodValidator(rc);
             if (validator == null) {
                 error = "valeur d'objet non conforme dans une array";
@@ -53,10 +57,11 @@ class ValidatorArray extends ValidatorAbstract {
                 } else if (c == ',') {
                     
                 } else {
-                    error = "caractère autre que ',' ou fin d'array ']' dans un objet de type arret";
+                    error = "caractère autre que ',' ou fin d'array ']' dans un objet de type array";
                     return false;
                 }  
             }
+            readNextNoWhite();
         }
     }
 }

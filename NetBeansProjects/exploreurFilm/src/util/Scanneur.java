@@ -44,7 +44,6 @@ public class Scanneur {
             }
             listIn = repertoire.listFiles(new FilmFileFilter());
             for (File listIn1 : listIn) {
-                System.out.println("         " + listIn1);
                 list[k] = listIn1;
                 k++;
             }
@@ -52,19 +51,5 @@ public class Scanneur {
         return list;
     }
 }
-//        list= repertoire.listFiles(filter.accept(, name));
-// 
-//			if (list != null){
-//				for ( int i = 0; i < list.length; i++) {
-//					// Appel récursif sur les sous-répertoires
-//					listeCheminFilm( list[i],type);
-//				} 
-//			} else {
-//				System.err.println(repertoire + " : Erreur de lecture.");
-//			}
-//		}
-//			if (repertoire.getPath()!= type){
-//				Resize size = new Resize(repertoire.getPath());
-//			}
-//	}    
+  
 

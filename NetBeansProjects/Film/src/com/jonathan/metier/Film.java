@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Film {
 
-    private int id;
+    private Integer id;
     private String titre;
     private Date dateRealisation;
     private Pays origine;
@@ -19,7 +19,7 @@ public class Film {
     private int duree;
     private List<String> chemins;
 
-    public Film(int id) {
+    public Film(Integer id) {
         this.id = id;
     }
 
@@ -35,7 +35,7 @@ public class Film {
         this.acteurs = acteurs;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -109,6 +109,10 @@ public class Film {
 
     public List<String> getChemins() {
         return chemins;
+    }
+    
+     public void  setChemins(List<String> chemins) {
+        this.chemins = chemins;
     }
     
     public void addChemin(String chemin) {

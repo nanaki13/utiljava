@@ -15,31 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package exploreurfilm;
+package exploreurfilm.vue;
 
-import com.jonathan.metier.Genre;
-import javax.swing.DefaultComboBoxModel;
+import exploreurfilm.StringMaker;
+import javax.swing.JMenuItem;
 
 /**
  *
  * @author jonathan
  */
-class GenreComboBoxModel extends DefaultComboBoxModel<Genre>{
+class JMenuItemObject<T> extends JMenuItem{
 
-    public GenreComboBoxModel(Genre[] genreArray) {
-        super(genreArray);
-       
-        Genre addNewGenre = new  Genre();
-         addNewGenre.setId(-1);
-        addNewGenre.setNom("ajouter");
-         insertElementAt(addNewGenre, 0);
-        addNewGenre = new  Genre();
-        addNewGenre.setId(-1);
-        addNewGenre.setNom(" ");
-         insertElementAt(addNewGenre, 0);
-         setSelectedItem(addNewGenre);
-        
-       
+    private T obj;
+    public JMenuItemObject(T obj, StringMaker<T> stringMaker) {
+        super();
+        if(stringMaker != null){
+            setText(stringMaker.buildString(obj));
+        }
+        else{
+            setText(obj.toString());
+        }
     }
+    
+     public JMenuItemObject(T obj) {
+        super(obj.toString());
+
+    }
+
+    public T getObj() {
+        return obj;
+    }
+    
+    
     
 }

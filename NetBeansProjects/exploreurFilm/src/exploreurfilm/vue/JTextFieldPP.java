@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package exploreurfilm;
+package exploreurfilm.vue;
 
 import com.jonathan.lib.collections.Chooser;
 import com.jonathan.lib.collections.ChooserText;
+import exploreurfilm.StringMaker;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,12 +33,10 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractListModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
@@ -138,6 +137,7 @@ public class JTextFieldPP<T> extends JTextField implements KeyListener, MouseLis
                                 forChoice = objects;
                             }
                             lastEntry = text;
+                            
                             List<T> choosen = Chooser.chooseAndOrder(forChoice, chooser, comparator);
                             lastObjects = choosen;
 //                            jPopupMenu.removeAll();
@@ -165,10 +165,12 @@ public class JTextFieldPP<T> extends JTextField implements KeyListener, MouseLis
 
                                 @Override
                                 public void valueChanged(ListSelectionEvent e) {
-                                    JTextFieldPP.this.setText(stringMaker.buildString(jl.getSelectedValue()));
+                                    if(jl.getSelectedValue()!=null)
+                                        JTextFieldPP.this.setText(stringMaker.buildString(jl.getSelectedValue()));
                                     jPopupMenu.setVisible(false);
                                 }
                             });
+//                            jl.set
                             if (/*vDeT.size()<10*/false) {
                                 jPopupMenu.add(jl);
                             } else {
@@ -248,7 +250,14 @@ public class JTextFieldPP<T> extends JTextField implements KeyListener, MouseLis
 //        jScrollPane.setFocusable(false);
         this.setComponentPopupMenu(jPopupMenu);
         jPopupMenu.addMouseListener(this);
-//        this.add(jComboBox);
+        stringMaker = new StringMaker<T>() {
+
+            @Override
+            public String buildString(T t) {
+                return t.toString();
+            }
+        };
+        
 
     }
 
