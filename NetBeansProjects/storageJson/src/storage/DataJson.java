@@ -7,6 +7,7 @@ package storage;
 
 import com.jonathan.json.ArrayJson;
 import com.jonathan.json.BooleanJson;
+import com.jonathan.json.JsonNull;
 import com.jonathan.json.JsonObject;
 import com.jonathan.json.JsonObjectInterface;
 import com.jonathan.json.NumberJson;
@@ -35,8 +36,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.jonathan.json.parser.ParserJson;
+import com.jonathan.utils.Reflexivite;
 import java.io.FileNotFoundException;
 import java.util.Date;
+import java.util.Objects;
 //import com.jonathan.metier.Acteur;
 //import com.jonathan.metier.Film;
 //import com.jonathan.metier.Pays;
@@ -51,34 +54,53 @@ public class DataJson {
     private static final String get = "get";
     private static final String set = "set";
 
-    public static void main(String[] a) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, DataJsonException {
+    public static void main(String[] a) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, DataJsonException, ClassNotFoundException, IOException {
+
         Test t = new Test();
+
         Test t2 = new Test();
         t2.setId(1);
         List<String> s = new LinkedList<>();
         List<Test> tl = new LinkedList<>();
         tl.add(t2);
         t2.setBoo(true);
-        s.add("coucou");
+        s.add("cou\ncou");
         s.add("pipi");
         t.setListS(s);
         t.setString("salut");
         t.setListTest(tl);
-        DataJson d = new DataJson();
-        JsonObjectInterface objectToJsonObjectLazy = d.objectToJsonObjectLazy(t);
-        System.out.println(objectToJsonObjectLazy.toStringJson());
-        System.out.println(d.objectToJsonObjectLazy(t2).toStringJson());
-        Test deserialiseOne = d.deserialiseOne(Test.class, d.objectToJsonObjectLazy(t2));
-        deserialiseOne = d.deserialiseOne(Test.class, objectToJsonObjectLazy);
-        System.out.println(deserialiseOne.getListS());
-        System.out.println(deserialiseOne.getString());
-        System.out.println(deserialiseOne.getListTest().get(0).getId());
-        System.out.println(deserialiseOne.getListTest().get(0).isBoo());
-
+        JsonObjectInterface objectToJsonObject = objectToJsonObject(t);
+        StringBuilder bl = new StringBuilder();
+        objectToJsonObject.toStringJsonPretty(bl,0);
+        System.out.println(bl);
+        Test deserialiseOneObject = deserialiseOneObject(Test.class , (JsonObject) objectToJsonObject);
+        System.out.println(deserialiseOneObject);
+        objectToFile(deserialiseOneObject, "teset.json");
+//        DataJson d = new DataJson();
+//        JsonObjectInterface objectToJsonObjectLazy = d.objectToJsonObjectLazy(t);
+//        System.out.println(objectToJsonObjectLazy.toStringJson());
+//        System.out.println(d.objectToJsonObjectLazy(t2).toStringJson());
+//        Test deserialiseOne = d.deserialiseOne(Test.class, d.objectToJsonObjectLazy(t2));
+//        deserialiseOne = d.deserialiseOne(Test.class, objectToJsonObjectLazy);
+//        System.out.println(deserialiseOne.getListS());
+//        System.out.println(deserialiseOne.getString());
+//        System.out.println(deserialiseOne.getListTest().get(0).getId());
+//        System.out.println(deserialiseOne.getListTest().get(0).isBoo());
 //        DataJson d = new DataJson();
 //        System.out.println(d.objectToJsonObject(8l).toStringJson());
 //        t = d.
 //        test();
+
+    }
+
+    public static String getInsideRaw(String type) {
+        int indexOf = type.indexOf('<');
+        int lastIndexOf = type.lastIndexOf('>');
+        if (indexOf != -1 && lastIndexOf != -1) {
+            String substring = type.substring(indexOf + 1, lastIndexOf);
+            return substring;
+        }
+        return null;
     }
 
     public static void objectToFile(Object o, String file) {
@@ -87,27 +109,38 @@ public class DataJson {
 
             File f = new File(file);
             try (FileWriter fw = new FileWriter(f)) {
-                fw.write(objectToJsonObject.toStringJson());
+                objectToJsonObject.toStringJson(fw);
             }
         } catch (DataJsonException | IOException ex) {
             Logger.getLogger(DataJson.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public static <T> T FileToObject(Class<T> aClass, String file) throws DataJsonException {
+    public static <T> T fileToObject(Class<T> aClass, String file) throws DataJsonException {
         try {
             ParserJson pj;
             pj = new ParserJson(new File(file));
             JsonObjectInterface parse;
             parse = pj.parse();
+            if (parse.getType() != TypeJson.OBJET) {
+                throw new DataJsonException("le type d'objet dans le fichier n'est pas Object : " + parse.getType());
+            }
 //            JsonObject fileToOneJson = Storage.fileToOneJson(new File(file));
-            return deserialiseOneObject(aClass, parse);
+            return deserialiseOneObject(aClass, (JsonObject) parse);
         } catch (ValidatorException | DataJsonException | IOException ex) {
             throw new DataJsonException(ex);
         }
 
     }
     private static final String getClass = "getClass";
+
+    private static String findFieldName(Method method) {
+        if(method.getName().startsWith(get) || method.getName().startsWith(set))
+            return lcFirst(method.getName().substring(3));
+        else{
+            return lcFirst(method.getName().substring(2));
+        }
+    }
 
     public void clearCacheDeserealisation() {
         cacheObject.clear();
@@ -221,7 +254,7 @@ public class DataJson {
 
     }
 
-    public static void test2() throws DataJsonException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+    public static void test2() throws DataJsonException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IOException {
         JsonObject jo = new JsonObject();
         jo.put("string", "balzla");
         jo.put("nb", 123);
@@ -244,7 +277,7 @@ public class DataJson {
         // DataJson dt = new DataJson();
         //  dt.ser
         jo = (JsonObject) objectToJsonObject(test);
-        System.out.println(jo.toStringJsonPretty());
+        jo.toStringJsonPretty(System.out, 0);
         test = deserialiseOneObject(Test.class, jo);
         System.out.println(test.boo);
         DataJson dt = new DataJson();
@@ -404,6 +437,7 @@ public class DataJson {
             List<JsonObjectInterface> jsonObjects = aj.getJsonObjects();
 //            Collection<JsonObject> values = Storage.fileToSetJson(new File(file));
             Method[] methods = c.getMethods();
+
             for (JsonObjectInterface joi : jsonObjects) {
 
                 ar.add(c.cast(deserialiseOne(c, joi, methods)));
@@ -576,103 +610,98 @@ public class DataJson {
 
     }
 
-    public static <T> T deserialiseOneObject(Class<T> clazz, JsonObjectInterface jo) throws DataJsonException {
-        return deserialiseOneObject(clazz, jo, clazz.getMethods());
+    public static <T> T deserialiseOneObject(Class<T> clazz, JsonObject jo) throws DataJsonException {
+        return deserialiseObject(clazz, jo, Reflexivite.getObjectSetters(clazz));
     }
 
-    public static Object extractObject(Method method, JsonObjectInterface jo) throws DataJsonException {
-        if (jo.getType() == TypeJson.BOOLEAN
-                || jo.getType() == TypeJson.TEXT
-                || jo.getType() == TypeJson.NUMBER) {
-            return deserialiseSimpleType(method.getParameterTypes()[0], jo);
-        } else {
-            if(jo.getType() == TypeJson.OBJET){
-                return deserialiseOneObject(method.getParameterTypes()[0], jo);
-            } else if(jo.getType() == TypeJson.ARRAY){
-                return deserialiseArray(method.getParameterTypes()[0], method.getGenericParameterTypes()[0], jo);
+//    public static Object extractObject(Method method, JsonObjectInterface jo) throws DataJsonException {
+//        if (jo.getType() == TypeJson.BOOLEAN
+//                || jo.getType() == TypeJson.TEXT
+//                || jo.getType() == TypeJson.NUMBER) {
+//            return deserialiseSimpleType(method.getParameterTypes()[0], jo);
+//        } else {
+//            if(jo.getType() == TypeJson.OBJET){
+//                return deserialiseOneObject(method.getParameterTypes()[0], jo);
+//            } else if(jo.getType() == TypeJson.ARRAY){
+//                return deserialiseArray(method.getParameterTypes()[0], method.getGenericParameterTypes()[0], jo);
+//            }
+//        }
+//        return null;
+//    }
+    public static Object deserialiseArray(Class<?> clazz, String insideGeneric, ArrayJson jo) throws DataJsonException {
+        try {
+            Collection compatibleCol = getCompatibleCol(clazz);
+            if (jo.isEmpty()) {
+                return compatibleCol;
             }
-        }
-        return null;
-    }
-    public static Object deserialiseArray(Class<?> clazz,Type type, JsonObjectInterface jo){
-        clazz.get
-        ArrayJson ar = (ArrayJson) jo;
-    }
-
-    public static <T> T deserialiseOneObject(Class<T> clazz, JsonObjectInterface jo, Method[] methods) throws DataJsonException {
-//        Method[] methods = clazz.getMethods();
-        Method method;
-        Object[] param = new Object[1];
-        Object newInstance = null;
-        if (jo.getType() == TypeJson.OBJET) {
-            try {
-                newInstance = clazz.newInstance();
-                JsonObject jsonObject = (JsonObject) jo;
-                Set<String> attributs = jsonObject.getKeys();
-                for (String attribut : attributs) {
-                    TypeJson type = jsonObject.getType(attribut);
-                    String ucFirstAttribut = ucFirst(attribut);
-                    String methodNameFor = set + ucFirstAttribut;
-                    method = getMethodByName(methodNameFor, methods);
-                    Class cFor = method.getParameterTypes()[0];
-                    param[0] = deserialiseOneObject(method, jsonObject.get(attribut));
-                    if (cFor.equals(Integer.TYPE)) {
-                        param[0] = jsonObject.getInt(attribut);
-                    } else if (cFor.equals(Float.TYPE)) {
-                        param[0] = jsonObject.getFloat(attribut);
-                    } else if (cFor.equals(Double.TYPE)) {
-                        param[0] = jsonObject.getDouble(attribut);
-                    } else if (cFor.equals(Long.TYPE)) {
-                        param[0] = jsonObject.getLong(attribut);
-                    } else if (cFor.equals(Boolean.TYPE)) {
-                        param[0] = jsonObject.getBoolean(attribut);
-                    } else if (type.equals(TypeJson.ARRAY)) {
-
-                        String name = cFor.getName();
-                        Type genericType = getGenericType(methodNameFor, methods);
-                        String substring = genericType.toString().substring(name.length());
-                        String genericClassName = substring.substring(1, substring.length() - 1);
-
-                        Class<?> forName = Class.forName(genericClassName);
-                        ArrayJson array = jsonObject.getArray(attribut);
-                        int size = array.size();
-                        Collection col;
-                        if (cFor.getConstructors().length == 0) {
-                            if (cFor.isAssignableFrom(List.class)) {
-                                col = new ArrayList();
-                            } else {
-                                col = new HashSet();
-                            }
-                        } else {
-                            col = (Collection) cFor.newInstance();
-                        }
-
-                        for (int i = 0; i < size; i++) {
-
-                            col.add(deserialiseOneObject(forName, array.get(i)));
-
-                        }
-                        param[0] = col;
-                    } else {
-                        param[0] = deserialiseOneObject(cFor, jsonObject.get(attribut));
-                    }
-
-//                    method = clazz.getMethod(methodNameFor, cFor);
-                    method.invoke(newInstance, param);
+            String insideRaw = getInsideRaw(insideGeneric);
+            TypeJson type = jo.get(0).getType();
+            if (insideRaw != null) {
+                String supposedCol = insideGeneric.substring(0, insideGeneric.indexOf('<'));
+                clazz = Class.forName(supposedCol);
+                if (type != TypeJson.ARRAY) {
+                    throw new DataJsonException("le type n'est pas une array");
                 }
-            } catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException | ClassNotFoundException ex) {
-                throw new DataJsonException(ex);
+            } else {
+                clazz = Class.forName(insideGeneric);
             }
-        } else if (jo.getType() == TypeJson.TEXT) {
-            newInstance = ((TextJson) jo).getValue();
-        } else if (jo.getType() == TypeJson.NUMBER) {
-            NumberJson bg = (NumberJson) jo;
-            newInstance = processNumber(bg, clazz);
-        } else if (jo.getType() == TypeJson.BOOLEAN) {
-            BooleanJson booleanJson = (BooleanJson) jo;
-            newInstance = booleanJson.getValue();
+            for (int i = 0; i < jo.size(); i++) {
+                Object toAdd = null;
+                switch (type) {
+                    case ARRAY:
+                        toAdd = deserialiseArray(clazz, insideRaw, jo.getArray(i));
+                        break;
+                    case OBJET:
+                        toAdd = deserialiseOneObject(clazz, jo.getObject(i));
+                        break;
+                    case NULL:
+                        break;
+                    default:
+                        toAdd = deserialiseSimpleType(clazz, jo.get(i));
+                }
+                compatibleCol.add(toAdd);
+            }
+            return compatibleCol;
+        } catch (InstantiationException ex) {
+            throw new DataJsonException(ex);
+        } catch (IllegalAccessException ex) {
+            throw new DataJsonException(ex);
+        } catch (ClassNotFoundException ex) {
+            throw new DataJsonException(ex);
         }
-        return clazz.cast(newInstance);
+    }
+
+    public static <T> T deserialiseObject(Class<T> clazz, JsonObject jo, Method[] methods) throws DataJsonException {
+        try {
+//            Method[] setters = Reflexivite.getSetters(clazz);
+            T newInstance = clazz.newInstance();
+            Object[] param = new Object[1];
+            for (Method method : methods) {
+                String fileld = lcFirst(method.getName().substring(3));
+                JsonObjectInterface joi = jo.get(fileld);
+                Class<?> classParam = method.getParameterTypes()[0];
+                if (joi != null) {
+                    if (joi.getType() == TypeJson.OBJET) {
+                        param[0] = deserialiseOneObject(classParam, (JsonObject) joi);
+                    } else if (joi.getType() == TypeJson.ARRAY) {
+                        method.getGenericParameterTypes()[0].toString();
+                        String fullClassString = method.getGenericParameterTypes()[0].toString();
+                        String insideRaw = getInsideRaw(fullClassString);
+                        param[0] = deserialiseArray(classParam, insideRaw, (ArrayJson) joi);
+                    } else {
+                        param[0] = deserialiseSimpleType(classParam, joi);
+                    }
+                }
+                method.invoke(newInstance, param[0]);
+            }
+            return newInstance;
+        } catch (InstantiationException | IllegalAccessException ex) {
+            throw new DataJsonException(ex);
+        } catch (IllegalArgumentException ex) {
+            throw new DataJsonException(ex);
+        } catch (InvocationTargetException ex) {
+            throw new DataJsonException(ex);
+        }
     }
 
     private static Object processNumber(NumberJson num, Class clazz) {
@@ -692,7 +721,10 @@ public class DataJson {
     public <T> T deserialiseOneObject(Class<T> c, String file) throws DataJsonException, FileNotFoundException, IOException, ValidatorException {
 
         JsonObjectInterface jo = new ParserJson(new File(file)).parse();
-        return deserialiseOneObject(c, jo);
+        if (jo.getType() != TypeJson.OBJET) {
+            throw new DataJsonException("le type n'est pas objet : type de l'objet : " + jo.getType());
+        }
+        return deserialiseOneObject(c, (JsonObject) jo);
 
     }
 
@@ -718,7 +750,7 @@ public class DataJson {
                 while (iterator.hasNext()) {
                     Object next = iterator.next();
                     if (!objectsDejaSerealise.contains(next)) {
-                        bw.append(objectToJsonObjectLazy(next).toStringJson());
+                        objectToJsonObjectLazy(next).toStringJson(bw);
                         if (iterator.hasNext()) {
                             bw.append(',');
                             bw.append('\n');
@@ -752,7 +784,7 @@ public class DataJson {
      * @param file
      * @throws storage.DataJsonException
      */
-    public void serialise(Collection<?> objects, String file) throws DataJsonException {
+    public static void serialise(Collection<?> objects, String file) throws DataJsonException {
         FileWriter fw;
         try {
 
@@ -761,7 +793,7 @@ public class DataJson {
             try (BufferedWriter bw = new BufferedWriter(fw)) {
                 bw.append('[');
                 while (iterator.hasNext()) {
-                    bw.append(objectToJsonObject(iterator.next()).toStringJson());
+                    objectToJsonObject(iterator.next()).toStringJson(bw);
                     if (iterator.hasNext()) {
                         bw.append(',');
                     }
@@ -804,7 +836,6 @@ public class DataJson {
         }
         JsonObject jo = new JsonObject();
         Method[] methods = aClass.getMethods();
-
         for (int i = 0; i < methods.length; i++) {
             Method method;
             method = methods[i];
@@ -917,8 +948,11 @@ public class DataJson {
     }
 
     public static JsonObjectInterface objectToJsonObject(Object o) throws DataJsonException {
-
+        if(o == null){
+            return JsonNull.NULL;
+        }
         Class<? extends Object> aClass = o.getClass();
+//        System.out.println(aClass);
         if (aClass.equals(Integer.class)) {
             Integer i = (Integer) o;
             return new NumberJson(i);
@@ -937,100 +971,34 @@ public class DataJson {
         } else if (aClass.equals(Boolean.class)) {
             Boolean i = (Boolean) o;
             return (i == true) ? BooleanJson.TRUE : BooleanJson.FALSE;
+        }else if (aClass.equals(Character.class)) {
+            Character i = (Character) o;
+            return new TextJson(String.valueOf(i));
+        } else if (Collection.class.isAssignableFrom(aClass)){
+            Collection col = (Collection) o;
+            ArrayJson aj = new ArrayJson();
+            Iterator iterator = col.iterator();
+            while (iterator.hasNext()) {
+                Object object = iterator.next();
+                aj.add(objectToJsonObject(object));              
+            }
+            return aj;
         }
         JsonObject jo = new JsonObject();
-        Method[] methods = aClass.getMethods();
-        try {
-            for (int i = 0; i < methods.length; i++) {
-                Method method;
-                method = methods[i];
-                String name = method.getName();
-                boolean matches;
-                matches = name.startsWith(get);
-                if (matches) {
-                    Class<?> returnType = method.getReturnType();
-                    String ReturnTypeName = method.getReturnType().getName();
-                    Class<?>[] parameterTypes = method.getParameterTypes();
-                    String nomApresGet = method.getName().substring(3);
-                    nomApresGet = lcFirst(nomApresGet);
-                    if (returnType.isPrimitive() && parameterTypes.length == 0) {
-                        if (method.getParameterTypes().length == 0) {
-                            switch (ReturnTypeName) {
-                                case "int": {
-                                    int x = (int) method.invoke(o, (Object[]) null);
-                                    jo.put(nomApresGet, x);
-                                    break;
+        Method[] methods = Reflexivite.getObjectGetters(aClass);
 
-                                }
-                                case "double": {
-                                    double x = (double) method.invoke(o, (Object[]) null);
-
-                                    jo.put(nomApresGet, x);
-                                    break;
-                                }
-                                case "float": {
-                                    float x = (float) method.invoke(o, (Object[]) null);
-                                    jo.put(nomApresGet, x);
-                                    break;
-                                }
-                                case "char": {
-                                    char x = (char) method.invoke(o, (Object[]) null);
-                                    jo.put(nomApresGet, x);
-                                    break;
-                                }
-                                case "boolean": {
-                                    boolean x = (boolean) method.invoke(o, (Object[]) null);
-                                    jo.put(nomApresGet, x);
-                                    break;
-                                }
-                            }
-                        }
-                    } else if (returnType.equals(String.class)) {
-                        String x = (String) method.invoke(o, (Object[]) null);
-                        jo.put(nomApresGet, x);
-
-                    } else if (returnType.equals(Integer.class)) {
-                        Integer x = (Integer) method.invoke(o, (Object[]) null);
-                        jo.put(nomApresGet, x);
-
-                    } else {
-                        if (!nomApresGet.equals("class")) {
-//                        Class avtDerniereClass = lastSuperBeforeObj(returnType);
-//                        if (avtDerniereClass != null) {
-                            if (Collection.class.isAssignableFrom(returnType)) {
-                                Collection<?> x = (Collection<?>) method.invoke(o, (Object[]) null);
-                                if (x != null) {
-                                    ArrayJson aj = new ArrayJson();
-                                    for (Object object : x) {
-                                        aj.add(objectToJsonObject(object));
-                                    }
-                                    jo.put(nomApresGet, aj);
-                                }
-                            } else {
-                                Object x = method.invoke(o, (Object[]) null);
-                                if (x != null) {
-                                    jo.put(nomApresGet, objectToJsonObject(x));
-                                }
-
-                            }
-//                        }
-                        } else {
-//                        jo.put("class", o.getClass().getName());
-                        }
-                    }
-                } else if (name.startsWith("is")) {
-                    String nomApresIs = name.substring(2);
-                    nomApresIs = lcFirst(nomApresIs);
-                    Class<?> returnType = method.getReturnType();
-                    Class<?>[] parameterTypes = method.getParameterTypes();
-                    if ((returnType.equals(Boolean.class) || returnType.equals(Boolean.TYPE)) && parameterTypes.length == 0) {
-                        Boolean b = (Boolean) method.invoke(o, (Object[]) null);
-                        jo.put(nomApresIs, b);
-                    }
-                }
+        for (Method method : methods) {
+            try {
+                Object invoke = method.invoke(o, (Object[]) null);
+                jo.put(findFieldName(method), objectToJsonObject(invoke));
+                
+            } catch (IllegalAccessException ex) {
+                throw new DataJsonException(ex);
+            } catch (IllegalArgumentException ex) {
+                throw new DataJsonException(ex);
+            } catch (InvocationTargetException ex) {
+                throw new DataJsonException(ex);
             }
-        } catch (Exception e) {
-            throw new DataJsonException(e);
         }
 
         return jo;
