@@ -26,6 +26,7 @@ import com.jonathan.metier.MembreFilm;
 import com.jonathan.metier.Metier;
 import com.jonathan.metier.Pays;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -53,21 +54,31 @@ public class Controleur implements ControleurInterface{
     
     public Controleur() throws DataJsonException{
         dataJson = new DataJson();
-        genres = dataJson.deserialise(Genre.class, "genres.json");
-        metiers = dataJson.deserialise(Metier.class, "metiers.json");
-        pays = dataJson.deserialise(Pays.class, "pays.json");
-        membreFilm = dataJson.deserialise(MembreFilm.class, "membresFilm.json");
-        films = dataJson.deserialise(Film.class, "films.json");
+        genres = dataJson.deserialiseObjects(Genre.class, "genres.json");
+        metiers = dataJson.deserialiseObjects(Metier.class, "metiers.json");
+        pays = dataJson.deserialiseObjects(Pays.class, "pays.json");
+        membreFilm = dataJson.deserialiseObjects(MembreFilm.class, "membresFilm.json");
+        films = dataJson.deserialiseObjects(Film.class, "films.json");
     }
 
     @Override
     public void exit() {
-        dataJson.serialiseLazy(genres, "genres.json");
-        dataJson.serialiseLazy(metiers, "metiers.json");
-        dataJson.serialiseLazy(pays, "pays.json");
-        dataJson.serialiseLazy(films, "films.json");
-        
-        System.exit(0);
+        try {
+            dataJson.serialiseLazy(genres, "genres.json");
+            dataJson.serialiseLazy(metiers, "metiers.json");
+            dataJson.serialiseLazy(pays, "pays.json");
+            dataJson.getSerialiseJustId().add(Pays.class);
+            dataJson.getSerialiseJustId().add(Genre.class);
+            dataJson.getSerialiseJustId().add(Metier.class);
+//            dataJson.getSerialiseJustId().add(Pays.class);
+            dataJson.serialiseLazy(films, "films.json");
+            
+            System.exit(0);
+        } catch (DataJsonException ex) {
+            Logger.getLogger(Controleur.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Controleur.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public List<Genre> getGenres() {
@@ -75,7 +86,7 @@ public class Controleur implements ControleurInterface{
     }
 
     public List<Film> getFilms() {
-        return films;
+           return films;
     }
 
     public List<Metier> getMetiers() {

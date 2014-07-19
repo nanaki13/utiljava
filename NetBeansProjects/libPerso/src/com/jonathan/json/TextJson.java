@@ -5,6 +5,7 @@
 package com.jonathan.json;
 
 import com.jonathan.lib.string.StringTool;
+import java.io.IOException;
 
 /**
  *
@@ -37,10 +38,11 @@ public class TextJson implements JsonObjectInterface,FeuilleJson<String>{
     }
 
     @Override
-    public String toStringJson() {
+    public Appendable toStringJson(Appendable out) throws IOException {
         if(data!=null)
-            return encloser+StringTool.echapeInvisibleChar(data, encloser)+encloser;
-        else return "null";
+            out.append( encloser+StringTool.echapeInvisibleChar(data, encloser)+encloser);
+        else out.append("null");
+        return out;
     }
     @Override
     public String toString() {
@@ -48,8 +50,8 @@ public class TextJson implements JsonObjectInterface,FeuilleJson<String>{
     }
 
     @Override
-    public int toStringJsonPretty(StringBuilder b ,int indent) {
-        b.append(toStringJson());
+    public int toStringJsonPretty(Appendable b ,int indent) throws IOException {
+        toStringJson(b);
         return indent;
     }
 

@@ -4,6 +4,8 @@
  */
 package com.jonathan.json;
 
+import java.io.IOException;
+
 /**
  *
  * @author jonathan
@@ -11,6 +13,6 @@ package com.jonathan.json;
 public interface JsonObjectInterface {
     public static String INDENTSPACE="  ";
     public TypeJson  getType();
-    public String toStringJson();
-    public int toStringJsonPretty(StringBuilder out , int indent );
+    public Appendable toStringJson(Appendable out)throws IOException;
+    public int toStringJsonPretty(Appendable out , int indent ) throws IOException;
 }

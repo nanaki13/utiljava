@@ -78,6 +78,7 @@ public class ValidatorObjet extends ValidatorAbstract {
                         valid = false;
                         return valid;
                     }
+//                    System.out.println(key);
                     valid = validator.processValidation();
                     if (!valid) {
                         error = validator.error;

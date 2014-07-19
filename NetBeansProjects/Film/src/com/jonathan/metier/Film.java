@@ -15,7 +15,7 @@ public class Film {
     private List<MembreFilm> realisateurs;
     private List<MembreFilm> acteurs;
 
-    private Genre genre;
+    private List<Genre> genres;
     private int duree;
     private List<String> chemins;
 
@@ -91,12 +91,12 @@ public class Film {
         this.realisateurs = realisateurs;
     }
 
-    public Genre getGenre() {
-        return genre;
+    public List<Genre> getGenres() {
+        return genres;
     }
 
-    public void setGenre(Genre genre) {
-        this.genre = genre;
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
     }
 
     public int getDuree() {

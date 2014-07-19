@@ -30,7 +30,7 @@ public class Application {
         config.setDataPath("/home/jonathan/trzst");
         DataJson.objectToFile(config, "config.json");
         
-        config = DataJson.FileToObject(Config.class, "config.json" );
+        config = DataJson.fileToObject(Config.class, "config.json" );
         
         
     }

@@ -4,6 +4,7 @@
  */
 package com.jonathan.json;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,26 +52,26 @@ public class ArrayJson implements JsonObjectInterface {
     }
 
     @Override
-    public String toStringJson() {
-        StringBuilder builder = new StringBuilder(100);
-        builder.append('[');
+    public Appendable toStringJson(Appendable out) throws IOException{
+//        StringBuilder out = new StringBuilder(100);
+        out.append('[');
         // Iterator<JsonObjectInterface> iterator = jsonObjects.iterator();
         // System.out.println(jsonObjects.());
         for (Iterator<JsonObjectInterface> it = jsonObjects.iterator(); it.hasNext();) {
             JsonObjectInterface jsonObjectInterface = it.next();
-            builder.append(jsonObjectInterface.toStringJson());
+            jsonObjectInterface.toStringJson(out);
             if (it.hasNext()) {
-                builder.append(',');
+                out.append(',');
             }
 
         }
-        builder.append(']');
-        return builder.toString();
+        out.append(']');
+        return out;
     }
 
     @Override
-    public int toStringJsonPretty(StringBuilder builder, int indent) {
-        builder.append('\n');
+    public int toStringJsonPretty(Appendable builder, int indent) throws IOException {
+//        builder.append('\n');
         for (int i = 0; i < indent; i++) {
             builder.append(INDENTSPACE);
         }
@@ -81,10 +82,10 @@ public class ArrayJson implements JsonObjectInterface {
 //        }
         for (Iterator<JsonObjectInterface> it = jsonObjects.iterator(); it.hasNext();) {
             JsonObjectInterface jsonObjectInterface = it.next();
-            if(jsonObjectInterface.getType() != TypeJson.OBJET){
-                  for (int i = 0; i < indent; i++) {
+            if(jsonObjectInterface.getType() != TypeJson.OBJET && jsonObjectInterface.getType() != TypeJson.ARRAY){
+                for (int i = 0; i < indent; i++) {
                     builder.append(INDENTSPACE);
-                }              
+                }
             }
             jsonObjectInterface.toStringJsonPretty(builder, indent);
             if (it.hasNext()) {
@@ -114,5 +115,9 @@ public class ArrayJson implements JsonObjectInterface {
 
     public int size() {
         return jsonObjects.size();
+    }
+
+    public boolean isEmpty() {
+        return jsonObjects.isEmpty();
     }
 }

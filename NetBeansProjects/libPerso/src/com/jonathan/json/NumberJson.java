@@ -4,6 +4,7 @@
  */
 package com.jonathan.json;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -93,13 +94,14 @@ public class NumberJson extends BigDecimal implements JsonObjectInterface,Feuill
     }
   
     @Override
-    public String toStringJson() {
-        return toPlainString();
+    public Appendable toStringJson(Appendable out) throws IOException {
+        out.append(toPlainString());
+        return out;
     }
 
    @Override
-    public int toStringJsonPretty(StringBuilder b ,int indent) {
-        b.append(toStringJson());
+    public int toStringJsonPretty(Appendable b ,int indent) throws IOException {
+        toStringJson(b);
         return indent;
     }
 

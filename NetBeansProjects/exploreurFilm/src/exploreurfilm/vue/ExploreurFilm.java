@@ -16,6 +16,8 @@
  */
 package exploreurfilm.vue;
 
+import com.jonathan.lib.collections.Chooser;
+import com.jonathan.lib.collections.ChooserText;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -42,6 +44,7 @@ import exploreurfilm.Controleur;
 import exploreurfilm.ImporterAction;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,19 +58,8 @@ import storage.DataJsonException;
  *
  * @author jonathan
  */
-public class ExploreurFilm {
+public class ExploreurFilm implements WindowListener , ActionListener {
 
-    public static void main(String[] args) {
-        Controleur c;
-        try {
-            c = new Controleur();
-            ExploreurFilm exploreurFilm = new ExploreurFilm(c);
-            c.setExploreurFilm(exploreurFilm);
-        } catch (DataJsonException ex) {
-            Logger.getLogger(ExploreurFilm.class.getName()).log(Level.SEVERE, "erreur au démarage", ex);
-        }
-
-    }
     private final JFrame jf;
     private final JMenuBar menuBar;
     private final Form vueG;
@@ -77,6 +69,8 @@ public class ExploreurFilm {
     private final VueFilm jpNvFilm;
 //    private final VueFilm jpNvFilm;
     private List<String> filmPathCol;
+//    private Controleur c;
+    private final JMenuItem itemFilmChercher;
 
     public ExploreurFilm(final Controleur c) {
         this.controleur = c;
@@ -86,15 +80,18 @@ public class ExploreurFilm {
         menuBar = new JMenuBar();
         JMenu menuFichier = new JMenu("Fichier");
         JMenu menuEditer = new JMenu("Editer");
-        JMenu menuFilm = new JMenu("Film");
-
+        JMenu menuChercher = new JMenu("Chercher");
+        JMenu menuFilmEditer = new JMenu("Film");
+        itemFilmChercher = new JMenuItem("Film");
+        itemFilmChercher.addActionListener(this);
+        menuChercher.add(itemFilmChercher);
         JMenuItem nouveauFilm = new JMenuItem("nouveau");
         JMenuItem importerItem = new JMenuItem("importer");
         ImporterAction importerAction = new ImporterAction(this);
         importerItem.addActionListener(importerAction);
-        menuFilm.add(nouveauFilm);
-        menuFilm.add(importerItem);
-        menuEditer.add(menuFilm);
+        menuFilmEditer.add(nouveauFilm);
+        menuFilmEditer.add(importerItem);
+        menuEditer.add(menuFilmEditer);
         JMenuItem itemQuitter = new JMenuItem("Quitter");
         menuFichier.add(itemQuitter);
         itemQuitter.addActionListener(new ActionListener() {
@@ -106,69 +103,15 @@ public class ExploreurFilm {
         });
         menuBar.add(menuFichier);
         menuBar.add(menuEditer);
+        menuBar.add(menuChercher);
 
         jf.setJMenuBar(menuBar);
 
         vueG = new Form();
-//        FlowLayout fl = (FlowLayout) vueG.getLayout();
-//        fl.setAlignment(FlowLayout.LEFT);
         vueD = new JPanel();
-
-//        scrolPaneG = new JScrollPane(vueG);
-//        JScrollPane scrolPaneD = new JScrollPane(vueD);
-        // js.add
-        // vueD.setPreferredSize(new Dimension(100, 100));
-//        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-//                scrolPaneG, scrolPaneD);
-//        splitPane.setOneTouchExpandable(false);
-//        splitPane.setDividerLocation(100);
-//Provide minimum sizes for the two components in the split pane
-        //      Dimension minimumSize = new Dimension(200, 200);
-//listScrollPane.setMinimumSize(minimumSize);
-//pictureScrollPane.setMinimumSize(minimumSize);
         jf.setContentPane(vueG);
-        //  jf.setMinimumSize(minimumSize);
-        //  jp.add(js);
 
-        WindowListener w = new WindowListener() {
-
-            @Override
-            public void windowOpened(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-                c.exit();
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowActivated(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-
-            }
-        };
-
-        jf.addWindowListener(w);
+        jf.addWindowListener(this);
         jf.pack();
         jf.setSize(new Dimension(900, 600));
         jf.setLocationRelativeTo(null);
@@ -178,7 +121,7 @@ public class ExploreurFilm {
 
     public void importPerformed(List<String> filmPathCol) {
         vueG.removeAll();
-        vueG.setBackground(Color.BLUE);
+//        vueG.setBackground(Color.BLUE);
         this.filmPathCol = filmPathCol;
 //        JPanel jp = new JPanel();
 //        jp.setBackground(Color.red);
@@ -272,5 +215,71 @@ public class ExploreurFilm {
         jf.repaint();
         importPerformed(filmPathCol);
     }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        controleur.exit();
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == itemFilmChercher){
+            jf.setContentPane((new VueChercherFilm(this, controleur )).getPabel());
+        }
+        jf.validate();
+        jf.repaint();
+    }
+
+    List<Film> chercherFilm(String text) {
+        ChooserText<Film> chooserText = new ChooserText<Film>() {
+
+            @Override
+            public boolean choose(Film o) {
+                return o.getTitre().toLowerCase().contains(text.toLowerCase());
+            }
+        };
+        chooserText.setText(text);
+        Comparator<Film> comparator = new Comparator<Film>() {
+
+            @Override
+            public int compare(Film o1, Film o2) {
+                return (o1.getTitre().compareToIgnoreCase(o2.getTitre()));
+            }
+        };
+        List<Film> filmsMatch = Chooser.chooseAndOrder(controleur.getFilms(), chooserText, comparator);
+        return filmsMatch;
+    }
+    
+    
 
 }

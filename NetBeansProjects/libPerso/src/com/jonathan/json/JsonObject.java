@@ -82,9 +82,9 @@ public class JsonObject implements JsonObjectInterface {
     }
 
     @Override
-    public String toStringJson() {
-        StringBuilder builder = new StringBuilder(100);
-        builder.append('{');
+    public Appendable toStringJson(Appendable out) throws IOException {
+//        StringBuilder out = new StringBuilder(100);
+        out.append('{');
         int size = data.size();
         int i = 0;
         for (Map.Entry<String, JsonObjectInterface> entry : data.entrySet()) {
@@ -98,22 +98,24 @@ public class JsonObject implements JsonObjectInterface {
                 ((TextJson) jsonObjectInterface).setEncloser(textEncloser);
             }
             if (guillemetOnKey == true) {
-                builder.append('"').append(StringTool.echapeInvisibleChar(key, '"')).append('"').append(':').append(jsonObjectInterface.toStringJson());
+                out.append('"').append(StringTool.echapeInvisibleChar(key, '"')).append('"').append(':');
+                jsonObjectInterface.toStringJson(out);
             } else {
-                builder.append(key).append(':').append(jsonObjectInterface.toStringJson());
+                out.append(key).append(':');
+                jsonObjectInterface.toStringJson(out);
             }
 
             i++;
             if (i < size) {
-                builder.append(',');
+                out.append(',');
             }
 
         }
-        builder.append('}');
-        return builder.toString();
+        out.append('}');
+        return out;
     }
 
-    public String toStringJsonPretty() {
+    public String toStringJsonPretty() throws IOException {
         StringBuilder builder = new StringBuilder(100);
         builder.append("{\n");
         int indent = 0;
@@ -152,11 +154,11 @@ public class JsonObject implements JsonObjectInterface {
     }
 
     @Override
-    public int toStringJsonPretty(StringBuilder builder, int indent) {
+    public int toStringJsonPretty(Appendable builder, int indent) throws IOException {
 //        builder.append('\n');
-//        for (int j = 0; j < indent; j++) {
-//            builder.append(INDENTSPACE);
-//        }
+        for (int j = 0; j < indent; j++) {
+            builder.append(INDENTSPACE);
+        }
         builder.append("{\n");
         indent++;
 
@@ -178,6 +180,9 @@ public class JsonObject implements JsonObjectInterface {
                 builder.append('"').append(StringTool.echapeInvisibleChar(key, '"')).append('"').append(':');
             } else {
                 builder.append(key).append(':');
+            }
+            if(jsonObjectInterface.getType() == TypeJson.OBJET || jsonObjectInterface.getType() == TypeJson.ARRAY){
+                builder.append('\n');
             }
             jsonObjectInterface.toStringJsonPretty(builder, indent);
             i++;

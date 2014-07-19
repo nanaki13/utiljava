@@ -36,11 +36,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JList;
@@ -52,34 +55,37 @@ import javax.swing.SwingConstants;
  *
  * @author jonathan
  */
-public class VueFilm implements ActionListener {
+public class VueFilm implements ActionListener, MouseListener, ObjectListener<Genre> {
 
     private JTextField titreJt;
     private JTextField dateRealisationJt;
     private JTextFieldPP origineJt;
     private JTextFieldPP lieuxDeTournageJt;
     private JTextArea synopsisJt;
-
+    public static final ImageIcon CLOSEICONE = new ImageIcon("./close.png");
     private JLabel titreJl;
     private JLabel dateRealisationJl;
     private JLabel origineJl;
     private JLabel lieuxDeTournageJl;
     private JLabel synopsisjL;
     private JButton enregistrer;
+    private final JPanel genresDuFilmPanel;
 //    private List<JLabel> removable = new LinkedList<JLabel>();
     private Form cheminForm;
     private final Form mainJpanel;
     private Film film;
     private final JLabel genrejL;
     private final JComboBox<Genre> genreJc;
-    private final List<Genre> genres;
+    private final List<Genre> allGenres;
+    private List<Genre> genreDuFilm;
     private List<Pays> pays;
-    private List<String> chemins  = new LinkedList<>();
+    private List<String> chemins = new LinkedList<>();
     private boolean justInit;
     private Controleur controleur;
 
-    public VueFilm(List<Genre> genres,List<Pays> pays, Controleur c) {
-        this.genres = genres;
+    public VueFilm(List<Genre> genres, List<Pays> pays, Controleur c) {
+        this.allGenres = genres;
+        genreDuFilm = new LinkedList<Genre>();
         this.pays = pays;
         controleur = c;
         titreJl = new JLabel("titre");
@@ -93,8 +99,9 @@ public class VueFilm implements ActionListener {
         titreJt = new JTextField(10);
         dateRealisationJt = new JTextField(10);
         enregistrer = new JButton();
+        genresDuFilmPanel = new JPanel();
         enregistrer.addActionListener(this);
-        
+
         Comparator<Pays> comparator = new Comparator<Pays>() {
 
             @Override
@@ -104,18 +111,19 @@ public class VueFilm implements ActionListener {
         };
         ChooserText<Pays> chooser;
         chooser = new ChooserText<Pays>() {
-            
+
             @Override
             public boolean choose(Pays o) {
                 String trim = text.trim();
                 String toLowerCase = trim.toLowerCase();
-                if(!toLowerCase.isEmpty())
+                if (!toLowerCase.isEmpty()) {
                     return o.getNom().toLowerCase().contains(toLowerCase);
-                else
+                } else {
                     return false;
+                }
             }
         };
-        origineJt = new JTextFieldPP<>(pays,chooser, 10);
+        origineJt = new JTextFieldPP<>(pays, chooser, 10);
         origineJt.setComparator(comparator);
         origineJt.setStringMaker(new StringMaker<Pays>() {
             @Override
@@ -124,7 +132,7 @@ public class VueFilm implements ActionListener {
             }
         });
 //        lieuxDeTournageJt = new JTextField(10);
-        lieuxDeTournageJt = new JTextFieldPP<>(pays,chooser, 10);
+        lieuxDeTournageJt = new JTextFieldPP<>(pays, chooser, 10);
         lieuxDeTournageJt.setComparator(comparator);
         lieuxDeTournageJt.setStringMaker(new StringMaker<Pays>() {
             @Override
@@ -133,11 +141,12 @@ public class VueFilm implements ActionListener {
             }
         });
         synopsisJt = new JTextArea(10, 20);
+        
         Genre[] genreArray = genres.toArray(new Genre[0]);
         GenreComboBoxModel genreModel = new GenreComboBoxModel(genreArray);
 
         genreJc = new JComboBox<>(genreModel);
-       genreJc.setRenderer(new exploreurfilm.vue.ListCellRenderer<Genre>(new StringMaker<Genre>() {
+        genreJc.setRenderer(new exploreurfilm.vue.ListCellRenderer<Genre>(new StringMaker<Genre>() {
 
             @Override
             public String buildString(Genre t) {
@@ -145,7 +154,7 @@ public class VueFilm implements ActionListener {
             }
         })
         );
-  
+
         genreJc.addActionListener(this);
 
         mainJpanel = new Form();
@@ -154,6 +163,8 @@ public class VueFilm implements ActionListener {
         mainJpanel.nextLine();
         mainJpanel.add(genrejL);
         mainJpanel.add(genreJc);
+        mainJpanel.nextLine();
+        mainJpanel.addS(genresDuFilmPanel, Form.MAX_SIZE);
         mainJpanel.nextLine();
         mainJpanel.add(dateRealisationJl);
         mainJpanel.add(dateRealisationJt);
@@ -173,8 +184,7 @@ public class VueFilm implements ActionListener {
         mainJpanel.nextLine();
         justInit = true;
 //        mainJpanel.add(cheminsJP);
-        
-        
+
 //
 //        SpringUtilities.makeCompactGrid(mainJpanel,
 //                7, 2, //rows, cols
@@ -183,7 +193,7 @@ public class VueFilm implements ActionListener {
     }
 
     public JPanel getJpanel() {
-       
+
         return mainJpanel;
     }
 
@@ -207,42 +217,62 @@ public class VueFilm implements ActionListener {
         return synopsisJt;
     }
 
-
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == genreJc) {
+            Genre selectedItem = (Genre) genreJc.getSelectedItem();
             String nom = ((Genre) (genreJc.getSelectedItem())).getNom();
             if (nom.equals("ajouter")) {
 //                    JOptionPane jOptionPane = new JOptionPane();
                 String newNomGenre = JOptionPane.showInputDialog(mainJpanel, "entrer le genre", "nouveau genre", JOptionPane.QUESTION_MESSAGE);
                 if (newNomGenre != null && !newNomGenre.trim().isEmpty()) {
-                    Genre genre = new Genre(Controleur.findFreeId(genres), newNomGenre);
+                    Genre genre = new Genre(Controleur.findFreeId(allGenres), newNomGenre);
                     genreJc.addItem(genre);
                     genreJc.setSelectedItem(genre);
-                    genres.add(genre);
+                    allGenres.add(genre);
+                    genreDuFilm.add(genre);
+                    RemovablePanelObject<Genre> r = new RemovablePanelObject(this, CLOSEICONE,this,genre);
+                    JLabel jl = new JLabel(genre.getNom());
+                    r.add(jl);
+                    genresDuFilmPanel.add(r);
                 }
-
+            } else if (selectedItem.getId() != -1) {
+                if(!genreDuFilm.contains(selectedItem)){
+                    genreDuFilm.add(selectedItem);
+                    RemovablePanelObject<Genre> r = new RemovablePanelObject(this, CLOSEICONE,this,selectedItem);
+                    JLabel jl = new JLabel(selectedItem.getNom());
+                    r.add(jl);
+                    genresDuFilmPanel.add(r);
+                    System.out.println(synopsisJt.getPreferredSize());
+                    mainJpanel.revalidate();
+                    mainJpanel.repaint();
+                }
+                
             }
-        }
-        else if(e.getSource() == enregistrer){
-            controleur.newFilm(getFilm());
-            
+        } else if (e.getSource() == enregistrer) {
+            controleur.newFilm(getNewFilm());
+
         }
 
     }
-    
-    public Film getFilm(){
-        if(film == null)
+
+    public Film getNewFilm() {
+        if (film == null) {
             film = new Film();
+        }
         film.setTitre(titreJt.getText());
         film.setSynopsis(synopsisJt.getText());
         film.setDateRealisation(null);
-        for(String ch : chemins){
+        for (String ch : chemins) {
             film.addChemin(ch);
         }
+        if(!genreDuFilm.isEmpty()){
+            film.setGenres(new LinkedList<Genre>(genreDuFilm) );
+        }
         
-      return film;
+        Film ret = film;
+        clearAll();
+        return ret;
     }
 
 //    public List<String> getChemins() {
@@ -251,42 +281,74 @@ public class VueFilm implements ActionListener {
 //        }
 //        return chemins;
 //    }
-
     void addChemin(String elementAt) {
         justInit = false;
         cheminForm.setBackground(Color.blue);
-        if(!chemins.contains(elementAt)){
-            if(chemins.isEmpty())
+        if (!chemins.contains(elementAt)) {
+            if (chemins.isEmpty()) {
                 mainJpanel.savePos();
+            }
             chemins.add(elementAt);
-            JLabel jLabel = new JLabel("chemin "+chemins.size());
+            JLabel jLabel = new JLabel("chemin " + chemins.size());
             jLabel.setToolTipText(elementAt);
 //            jLabel.setHorizontalAlignment(SwingConstants.LEFT);
 //            removable.add(jLabel);
             cheminForm.addS(jLabel, Form.LEFT);
             cheminForm.nextLine();
-        }   
+        }
     }
-    
-    void remove(){
-        if(!justInit)
-        {
+
+    void remove() {
+        if (!justInit) {
             chemins.clear();
 //            for(JLabel j : removable){
-                cheminForm.removeAll();;
+            cheminForm.removeAll();
 //            }
 //            mainJpanel.restorePos();
         }
     }
 
     void addChemins(List<String> selectedValuesList) {
-        for(String s : selectedValuesList){
+        for (String s : selectedValuesList) {
             addChemin(s);
         }
         enregistrer.setText("OK");
 //        mainJpanel.addWithEncapse(enregistrer);
+
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void event(Genre t) {
+        genreDuFilm.remove(t);
+    }
+
+    private void clearAll() {
+        chemins.clear();
+        genreDuFilm.clear();
+        synopsisJt.setText("");
+        genresDuFilmPanel.removeAll();
+        film = null;
         
     }
-    
 
 }

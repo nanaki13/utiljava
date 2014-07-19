@@ -257,7 +257,7 @@ public class StringTool {
         while (i != -1 && i != opener) {
             if (i == '\\') {
                 i= reader.read();
-                if (i != -1 ) {
+                if (i == -1 ) {
                     throw new IOException("fin du flux");
                 } else {
                     switch (i) {

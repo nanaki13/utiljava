@@ -6,6 +6,8 @@
 
 package com.jonathan.json;
 
+import java.io.IOException;
+
 /**
  *
  * @author jonathan
@@ -29,12 +31,13 @@ public class JsonNull implements JsonObjectInterface{
     }
 
     @Override
-    public String toStringJson() {
-        return "null";
+    public Appendable toStringJson(Appendable out ) throws IOException {
+        out.append("null");
+        return out;
     }
 
     @Override
-    public int toStringJsonPretty(StringBuilder out, int indent) {
+    public int toStringJsonPretty(Appendable out, int indent) throws IOException {
         out.append("null");
         return indent;
     }

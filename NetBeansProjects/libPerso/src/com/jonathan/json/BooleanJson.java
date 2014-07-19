@@ -6,6 +6,8 @@
 
 package com.jonathan.json;
 
+import java.io.IOException;
+
 /**
  *
  * @author jonathan
@@ -31,17 +33,18 @@ public class BooleanJson implements JsonObjectInterface{
     }
 
     @Override
-    public String toStringJson() {
+    public Appendable toStringJson(Appendable out) throws IOException {
         if(booleanValue == true){
-            return TRUE_STRING;
+            out.append(TRUE_STRING);
         }else{
-            return FALSE_STRING;
+            out.append(FALSE_STRING);
         }
+        return out;
     }
 
     @Override
-    public int toStringJsonPretty(StringBuilder out, int indent) {
-        out.append(toStringJson());
+    public int toStringJsonPretty(Appendable out, int indent) throws IOException {
+        toStringJson(out);
         return indent;
     }
     

@@ -1,3 +1,1 @@
-[{"id":1,"boo":true,"listInt":[0,2],"nb":123,"string":"balzla"},
-{"id":2,"boo":true,"listInt":[0,2],"nb":123,"string":"balzla"},
-{"id":3,"boo":true,"listInt":[0,2],"nb":123,"string":"balzla"}]
+[{"id":3,"listS":["cou\ncou","pipi"],"listlistS":[["cou\ncou","pipi"]],"boo":false,"listTest":["XWY","XWY"],"nb":0,"string":"salut","listlistT":[["XWY","XWY"],["XWY","XWY"]],"test2":"XWY"}]
