@@ -20,6 +20,7 @@ package exploreurfilm.vue;
 /**
  *
  * @author jonathan
+ * @param <T>
  */
 public interface ObjectListener<T> {
     public void event(T t);

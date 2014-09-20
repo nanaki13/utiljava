@@ -20,6 +20,7 @@ package exploreurfilm;
 /**
  *
  * @author jonathan
+ * @param <T>
  */
 public interface StringMaker<T> {
     public String buildString(T t);

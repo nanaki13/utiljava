@@ -269,14 +269,9 @@ public class ExploreurFilm implements WindowListener , ActionListener {
             }
         };
         chooserText.setText(text);
-        Comparator<Film> comparator = new Comparator<Film>() {
 
-            @Override
-            public int compare(Film o1, Film o2) {
-                return (o1.getTitre().compareToIgnoreCase(o2.getTitre()));
-            }
-        };
-        List<Film> filmsMatch = Chooser.chooseAndOrder(controleur.getFilms(), chooserText, comparator);
+        List<Film> filmsMatch = Chooser.chooseAndOrder(controleur.getFilms(), chooserText
+                , (Film f1, Film f2) -> f1.getTitre().compareToIgnoreCase(f2.getTitre()));
         return filmsMatch;
     }
     

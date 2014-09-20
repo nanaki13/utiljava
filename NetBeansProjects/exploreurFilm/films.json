@@ -1,4 +1,5 @@
-[{"id":1,"genres":[3],"chemins":["/home/jonathan/Vidéos/data/La.Vie.Domestique.mkv","/home/jonathan/Vidéos/data/Omar_Ma_Tuer.avi"],"synopsis":"","duree":0,"titre":"Omar_Ma_Tuer"},
-{"id":2,"genres":[16],"chemins":["/home/jonathan/Vidéos/data/Il.Etait.Une.Fois.En.Chine.1-.Zone-Telechargement.com.avi","/home/jonathan/Vidéos/data/Snowpiercer.2013.VOSTFR.zone-telechargement.com.avi"],"synopsis":"","duree":0,"titre":"Snowpiercer.2013.VOSTFR.zone-telechargement.com"},
-{"id":3,"genres":[16],"chemins":["/home/jonathan/Vidéos/data/the_amazing_spider_man.avi"],"synopsis":"","duree":0,"titre":"the_amazing_spider_man"},
-{"id":4,"chemins":["/home/jonathan/Vidéos/data/Thor.The.Dark.World.2013.VOSTFR.BRRip.XviD.AC3-S.V-www.Zone-Telechargement.com.avi"],"synopsis":"","duree":0,"titre":"Thor.The.Dark.World.2013.VOSTFR.BRRip.XviD.AC3-S.V-www.Zone-Telechargement.com"}]
+[{"chemins":["/home/jonathan/Vidéos/data/La.Vie.Domestique.mkv","/home/jonathan/Vidéos/data/Omar_Ma_Tuer.avi"],"genres":[3],"titre":"Omar_Ma_Tuer","duree":0,"synopsis":"","id":1},
+{"chemins":["/home/jonathan/Vidéos/data/Il.Etait.Une.Fois.En.Chine.1-.Zone-Telechargement.com.avi","/home/jonathan/Vidéos/data/Snowpiercer.2013.VOSTFR.zone-telechargement.com.avi"],"genres":[16],"titre":"Snowpiercer.2013.VOSTFR.zone-telechargement.com","duree":0,"synopsis":"","id":2},
+{"chemins":["/home/jonathan/Vidéos/data/the_amazing_spider_man.avi"],"genres":[16],"titre":"the_amazing_spider_man","duree":0,"synopsis":"","id":3},
+{"chemins":["/home/jonathan/Vidéos/data/Thor.The.Dark.World.2013.VOSTFR.BRRip.XviD.AC3-S.V-www.Zone-Telechargement.com.avi"],"titre":"Thor.The.Dark.World.2013.VOSTFR.BRRip.XviD.AC3-S.V-www.Zone-Telechargement.com","duree":0,"synopsis":"","id":4},
+{"chemins":["/home/jonathan/Vidéos/le_huitieme_jour_fr_DVDrip_DivX.avi"],"genres":[17],"titre":"le_huitieme_jour_fr_DVDrip_DivX","duree":0,"synopsis":"C'est un mongol","id":5}]

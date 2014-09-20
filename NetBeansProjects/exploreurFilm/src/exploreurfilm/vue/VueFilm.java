@@ -17,39 +17,27 @@
 package exploreurfilm.vue;
 
 import com.jonathan.lib.collections.ChooserText;
-import java.util.Date;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-import com.jonathan.lib.string.StringTool;
 import com.jonathan.metier.Film;
 import com.jonathan.metier.Genre;
 import com.jonathan.metier.Pays;
 import exploreurfilm.Controleur;
 import exploreurfilm.StringMaker;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.SwingConstants;
 
 /**
  *
