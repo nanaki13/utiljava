@@ -28,6 +28,10 @@ public class ArrayMap<T, U>  implements Map<T, U> {
         values = new ArrayList<>();
         keys = new ArrayList<>();
     }
+      public ArrayMap(int capacity) {
+        values = new ArrayList<>(capacity);
+        keys = new ArrayList<>(capacity);
+    }
     
     
 

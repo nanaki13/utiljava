@@ -5,6 +5,9 @@
  */
 package com.jonathan.reader;
 
+import com.jonathan.interpretor.Command;
+import com.jonathan.interpretor.ReaderCommand;
+import com.jonathan.lib.string.StringTool;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -59,35 +62,68 @@ public class ReaderCompteur extends Reader {
     public void close() throws IOException {
         reader.close();
     }
-    
-    public int readNextNoWhite() throws IOException{
- 
+
+    public int readNextNoWhite() throws IOException {
+
         int c = read();
-        boolean continu  = true;
+        boolean continu = true;
         while (continu) {
-            if( c == '\n' || c =='\r' || c == ' ' || c == '\t'){
+            if (c == '\n' || c == '\r' || c == ' ' || c == '\t') {
                 c = read();
-            }
-            else{
+            } else {
                 continu = false;
             }
         }
         return c;
     }
 
+    public String readLine() throws IOException {
+
+        int c = read();
+        StringBuilder bl = new StringBuilder();
+        boolean continu = true;
+        while (continu) {
+            if (c != '\n' && c != '\r') {
+                c = read();
+                if (c == -1) {
+                    return null;
+                }
+                bl.append((char) c);
+            } else {
+                continu = false;
+            }
+        }
+        return bl.toString();
+    }
+
+    public String readNextWord() throws IOException {
+        int read = read();
+        StringBuilder b = new StringBuilder();
+        while (isWhite(read) && read != -1) {
+            read = read();
+        }
+        if (read != '\"') {
+            while (!isWhite(read) && read != -1) {
+                b.append((char) read);
+                read = read();
+            }
+        }
+        else{
+            return StringTool.replaceEscapeCharByTrueChar(this);
+        }
+
+        if (b.length() == 0 && read == -1) {
+            return null;
+        }
+        return b.toString();
+    }
+
     public static void main(String[] args) throws IOException {
-        String s = "      *dvsdvsv\ndsvsdvsd";
-        StringReader sr = new StringReader(s);
-        ReaderCompteur rc = new ReaderCompteur(sr);
-        int c;
-        char[] buff = new char[10];
-//        while ((c = rc.read()) != -1) {
-//            System.out.println(rc.nbCharDeLigne + " " + rc.nbLigne);
-//        }
-//        System.out.println((char)rc.readNextNoWhite());
-//        System.out.println(rc.getNbCharDeLigne());
-        rc.read(buff, 0, 10);
-        System.out.println(rc.lastRead);
+        StringReader sr = new StringReader("  sdfsfa -vsvsv \"aze\\\"r  a\"\n");
+        ReaderCommand rc = new ReaderCommand(sr);
+        Command read = rc.read();
+        System.out.println(read);
+        
     }
 
     public int getNbLigne() {
@@ -101,7 +137,9 @@ public class ReaderCompteur extends Reader {
     public char getLastRead() {
         return lastRead;
     }
-    
-    
+
+    public static boolean isWhite(int c) {
+        return (c == '\n' || c == '\r' || c == ' ' || c == '\t');
+    }
 
 }
