@@ -1,0 +1,52 @@
+/*
+ * Copyright (C) 2014 jonathan
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.jonathan.lib.graphique;
+
+
+import com.jonathan.lib.string.StringMaker;
+import javax.swing.JMenuItem;
+
+/**
+ *
+ * @author jonathan
+ */
+class JMenuItemObject<T> extends JMenuItem{
+
+    private T obj;
+    public JMenuItemObject(T obj, StringMaker<T> stringMaker) {
+        super();
+        if(stringMaker != null){
+            setText(stringMaker.buildString(obj));
+        }
+        else{
+            setText(obj.toString());
+        }
+    }
+    
+     public JMenuItemObject(T obj) {
+        super(obj.toString());
+
+    }
+
+    public T getObj() {
+        return obj;
+    }
+    
+    
+    
+}
