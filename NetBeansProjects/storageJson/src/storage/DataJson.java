@@ -36,9 +36,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.jonathan.json.parser.ParserJson;
+import com.jonathan.metier.Film;
 import com.jonathan.utils.Reflexivite;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 //import com.jonathan.metier.Acteur;
@@ -57,6 +59,14 @@ public class DataJson {
 
     public static void main(String[] a) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, DataJsonException, ClassNotFoundException, IOException {
 
+        Film f = new Film();
+        f.setDateRealisation(new Date());
+        JsonObject objectToJsonObject2 = (JsonObject) objectToJsonObject(f);
+        System.out.println(objectToJsonObject2.toStringJsonPretty());
+        Film deserialiseOneObject2 = deserialiseOneObject(Film.class, objectToJsonObject2);
+        System.out.println(deserialiseOneObject2.getDateRealisation());
+        
+        System.exit(0);
         Test t = new Test();
         t.setId(3);
         Test2 t2 = new Test2();
@@ -221,6 +231,9 @@ public class DataJson {
 
         } else if (joi.getType() == TypeJson.BOOLEAN) {
             return ((BooleanJson) joi).getValue();
+        }
+        if(c.isPrimitive()){
+            return 0;
         }
         return null;
     }
@@ -853,6 +866,7 @@ public class DataJson {
                         param[0] = deserialiseSimpleType(classParam, joi);
                     }
                 }
+                System.out.println("newInstance : "+newInstance+"   method : "+method+"   /   param[0]"+param[0]);
                 method.invoke(newInstance, param[0]);
             }
             return newInstance;
@@ -932,6 +946,10 @@ public class DataJson {
             newInstance = num.doubleValue();
         } else if (clazz.equals(Long.class) || clazz.equals(Long.TYPE)) {
             newInstance = num.longValue();
+        }else if (clazz.equals(Date.class)) {
+            long longValue = num.longValue();
+            newInstance = new Date(longValue);
+            
         }
         return newInstance;
     }
@@ -1014,33 +1032,13 @@ public class DataJson {
 
     // static F jo = new JsonObject();
     public JsonObjectInterface objectToJsonObjectLazy(Object o) throws DataJsonException {
-        if (o == null) {
-            return JsonNull.NULL;
+        JsonObjectInterface joi = simpleTypeToJsonObject(o);
+        if(joi!=null){
+            return joi;
         }
         Class<? extends Object> aClass = o.getClass();
 //        System.out.println(aClass);
-        if (aClass.equals(Integer.class)) {
-            Integer i = (Integer) o;
-            return new NumberJson(i);
-        } else if (aClass.equals(Float.class)) {
-            Float i = (Float) o;
-            return new NumberJson(i);
-        } else if (aClass.equals(Long.class)) {
-            Long i = (Long) o;
-            return new NumberJson(i);
-        } else if (aClass.equals(Double.class)) {
-            Double i = (Double) o;
-            return new NumberJson(i);
-        } else if (aClass.equals(String.class)) {
-            String i = (String) o;
-            return new TextJson(i);
-        } else if (aClass.equals(Boolean.class)) {
-            Boolean i = (Boolean) o;
-            return (i == true) ? BooleanJson.TRUE : BooleanJson.FALSE;
-        } else if (aClass.equals(Character.class)) {
-            Character i = (Character) o;
-            return new TextJson(String.valueOf(i));
-        } else if (Collection.class.isAssignableFrom(aClass)) {
+        if (Collection.class.isAssignableFrom(aClass)) {
             Collection col = (Collection) o;
             ArrayJson aj = new ArrayJson();
             Iterator iterator = col.iterator();
@@ -1079,24 +1077,6 @@ public class DataJson {
                 if (!dontSerialise.contains(method.getReturnType())) {
                     Object invoke = method.invoke(o, (Object[]) null);
                     String findFieldName = findFieldName(method);
-//                    if (invoke != null) {
-//                        if (Collection.class.isAssignableFrom(invoke.getClass())) {
-//                            Collection col = (Collection) invoke;
-//                            if (!col.isEmpty()) {
-//                                Object next = col.iterator().next();
-//                                if (serialiseJustId.contains(next.getClass())) {
-//                                    findFieldName = "ids_" + findFieldName;
-//                                }
-////                                else if (dontSerialise.contains(next.getClass())) {
-////                                    continue;
-////                                }
-//                            }
-//                        } else {
-//                            if (serialiseJustId.contains(invoke.getClass())) {
-//                                findFieldName = "id_" + findFieldName;
-//                            }
-//                        }
-//                    }
                     if (invoke != null || (invoke == null && serializeNull)) {
                         jo.put(findFieldName, objectToJsonObjectLazy(invoke));
                     }
@@ -1116,8 +1096,7 @@ public class DataJson {
 
         return jo;
     }
-
-    public static JsonObjectInterface objectToJsonObject(Object o) throws DataJsonException {
+    private static JsonObjectInterface simpleTypeToJsonObject(Object o){
         if (o == null) {
             return JsonNull.NULL;
         }
@@ -1144,7 +1123,23 @@ public class DataJson {
         } else if (aClass.equals(Character.class)) {
             Character i = (Character) o;
             return new TextJson(String.valueOf(i));
-        } else if (Collection.class.isAssignableFrom(aClass)) {
+        }else if (aClass.equals(Date.class)) {
+            Date i = (Date) o;
+            return new NumberJson(i.getTime());
+        }else if (aClass.equals(Calendar.class)) {
+            Calendar i = (Calendar) o;
+            return new NumberJson(i.getTimeInMillis());
+        }
+        return null;
+    }
+    public static JsonObjectInterface objectToJsonObject(Object o) throws DataJsonException {
+        JsonObjectInterface joi = simpleTypeToJsonObject(o);
+        if(joi!= null){
+            return joi;
+        }
+        Class<?> aClass =o.getClass();
+        
+        if (Collection.class.isAssignableFrom(aClass)) {
             Collection col = (Collection) o;
             ArrayJson aj = new ArrayJson();
             Iterator iterator = col.iterator();
