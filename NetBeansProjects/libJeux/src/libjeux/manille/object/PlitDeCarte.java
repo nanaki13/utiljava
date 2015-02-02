@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.manille.object;
 
+import libjeux.manille.object.JoueurInterface;
+import libjeux.manille.object.Carte;
 import java.util.LinkedList;
 import java.util.List;
 

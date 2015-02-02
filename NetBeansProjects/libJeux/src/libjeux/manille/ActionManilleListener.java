@@ -3,12 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.manille;
+
+import libjeux.manille.object.JoueurInterface;
+import libjeux.manille.object.Equipe;
 
 /**
  *
  * @author jonathan
  */
-interface ActionManilleListener {
+public interface ActionManilleListener {
     public void settingEquipe(JoueurInterface j11,JoueurInterface j21,JoueurInterface j12,JoueurInterface j22, Equipe e1, Equipe e2);
 }

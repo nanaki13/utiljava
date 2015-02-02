@@ -3,8 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.manille;
 
+import libjeux.manille.object.PointPlit;
+import libjeux.manille.object.PlitDeCarte;
+import libjeux.manille.object.JoueurInterface;
+import libjeux.manille.object.Equipe;
+import libjeux.manille.object.CarteManille;
+import libjeux.manille.object.Carte;
 import bsh.EvalError;
 import bsh.Interpreter;
 import java.util.ArrayList;
@@ -27,12 +33,13 @@ public class Manille {
     private List<Carte> mainJ1E2;
     private List<Carte> mainJ2E2;
     private final Random rand;
-    private JoueurInterface meneur;
+    private JoueurInterface gaucheDonneur;
     private PlitDeCarte plit;
     private Carte.CouleurCarte atout;
     private JoueurInterface jouerCourant;
     private JoueurInterface[] joueurs = new JoueurInterface[4];
     private ActionManilleListener actionMailleListener;
+    private int gaucheDonIndex;
 
     public Manille(ActionManilleListener actionMailleListener) {
         this.actionMailleListener = actionMailleListener;
@@ -41,33 +48,32 @@ public class Manille {
         equipes[1] = new Equipe("E2");
         rand = new Random();
         plit = new PlitDeCarte();
-        
 
     }
 
     public void setJoueurs(JoueurInterface j1Equipe1, JoueurInterface j2Equipe1, JoueurInterface j1Equipe2, JoueurInterface j2Equipe2) {
-       
+
         joueurs[0] = j1Equipe1;
-        joueurs[1] = j2Equipe1;
-        joueurs[2] =  j1Equipe2;
+        joueurs[2] = j2Equipe1;
+        joueurs[1] = j1Equipe2;
         joueurs[3] = j2Equipe2;
-        equipes[0].joueur1 = j1Equipe1;
-        equipes[0].joueur2 = j2Equipe1;
-        equipes[1].joueur1 = j1Equipe2;
-        equipes[1].joueur2 = j2Equipe2;
-        actionMailleListener.settingEquipe(j1Equipe1,j2Equipe1,j1Equipe2,j2Equipe2,equipes[0], equipes[0]);
-         j1Equipe1.setEquipes(equipes[0],equipes[1]);
-        j2Equipe1.setEquipes(equipes[0],equipes[1]);
-        j1Equipe2.setEquipes(equipes[1],equipes[0]);
-        j2Equipe2.setEquipes(equipes[1],equipes[0]);
+        equipes[0].setJoueur1(j1Equipe1);
+        equipes[0].setJoueur2(j2Equipe1);
+        equipes[1].setJoueur1(j1Equipe2);
+        equipes[1].setJoueur2(j2Equipe2);
+        if (actionMailleListener != null) {
+            actionMailleListener.settingEquipe(j1Equipe1, j2Equipe1, j1Equipe2, j2Equipe2, equipes[0], equipes[0]);
+        }
+        j1Equipe1.setEquipes(equipes[0], equipes[1]);
+        j2Equipe1.setEquipes(equipes[0], equipes[1]);
+        j1Equipe2.setEquipes(equipes[1], equipes[0]);
+        j2Equipe2.setEquipes(equipes[1], equipes[0]);
     }
 
     public void run() {
 
-        
-        
         chooseMeneur();
-        jouerCourant = meneur;
+        jouerCourant = gaucheDonneur;
         while (equipes[0].getScoreTotal() < 104 && equipes[1].getScoreTotal() < 104) {
             melangeEtDistribu();
             askAtout();
@@ -85,49 +91,60 @@ public class Manille {
                 }
                 System.out.println(plit);
                 PointPlit count = plit.count();
-                jouerCourant = count.meneur;
+                jouerCourant = count.getMeneur();
 
                 Equipe equipe = jouerCourant.getEquipe();
-                equipe.setScore(equipe.getScore() + count.point);
+                equipe.setScore(equipe.getScore() + count.getPoint());
             }
             calcScore();
-           sayAll(equipes[0].joueur1.getName()+", " +equipes[0].joueur2.getName()+ " : " + equipes[0].getScoreTotal()+"\n"+equipes[1].joueur1.getName()+", " +equipes[1].joueur2.getName()+ " : " + equipes[1].getScoreTotal());
+            sayAll(equipes[0].getJoueur1().getName() + ", " + equipes[0].getJoueur2().getName() + " : " + equipes[0].getScoreTotal() + "\n" + equipes[1].getJoueur1().getName() + ", " + equipes[1].getJoueur2().getName() + " : " + equipes[1].getScoreTotal());
 //            next();
-            meneur = jouerCourant;
+            gaucheDonneur = nextGauchDonneur();
 
         }
-        
 
     }
 
+    private int indiceNextDonneur(){
+        gaucheDonIndex++;
+        return gaucheDonIndex%4;
+    }
+    private JoueurInterface nextGauchDonneur(){
+        System.out.println("gaucheDonIndex : "+gaucheDonIndex);
+        return joueurs[indiceNextDonneur()];
+    }
     private void chooseMeneur() {
         int nBgin = rand.nextInt(4);
         switch (nBgin) {
             case 0:
-                meneur = equipes[0].joueur1;
+                gaucheDonIndex = 0;
+                gaucheDonneur = equipes[0].getJoueur1();
                 break;
             case 1:
-                meneur = equipes[1].joueur2;
+                gaucheDonIndex = 1;
+                gaucheDonneur = equipes[1].getJoueur2();
                 break;
             case 2:
-                meneur = equipes[0].joueur2;
+                gaucheDonIndex = 2;
+                gaucheDonneur = equipes[0].getJoueur2();
                 break;
             case 3:
-                meneur = equipes[1].joueur1;
+                gaucheDonIndex = 3;
+                gaucheDonneur = equipes[1].getJoueur1();
                 break;
 
         }
     }
 
     private void askAtout() {
-        atout = meneur.chooseAtout();
+        atout = gaucheDonneur.chooseAtout();
 
         if (atout == null) {
-            sayAll(meneur.getName() + " dit en face");
-            atout = meneur.getEquipier().chooseAtoutEnFace();
+            sayAll(gaucheDonneur.getName() + " dit en face");
+            atout = gaucheDonneur.getEquipier().chooseAtoutEnFace();
         }
         for (JoueurInterface j : joueurs) {
-            j.setAtout(atout, meneur.getName() + " dit " + atout);
+            j.setAtout(atout, gaucheDonneur.getName() + " dit " + atout);
 
         }
 
@@ -136,7 +153,7 @@ public class Manille {
 
     private void next() {
         if (jouerCourant == null) {
-            jouerCourant = meneur;
+            jouerCourant = gaucheDonneur;
         }
         for (int i = 0; i < 4; i++) {
             if (joueurs[i] == jouerCourant) {
@@ -194,10 +211,10 @@ public class Manille {
         mainJ2E1 = new LinkedList<Carte>(Arrays.asList(mains[1]));
         mainJ1E2 = new LinkedList<Carte>(Arrays.asList(mains[2]));
         mainJ2E2 = new LinkedList<Carte>(Arrays.asList(mains[3]));
-        equipes[0].joueur1.setCartes(mainJ1E1);
-        equipes[0].joueur2.setCartes(mainJ2E1);
-        equipes[1].joueur1.setCartes(mainJ1E2);
-        equipes[1].joueur2.setCartes(mainJ2E2);
+        equipes[0].getJoueur1().setCartes(mainJ1E1);
+        equipes[0].getJoueur2().setCartes(mainJ2E1);
+        equipes[1].getJoueur1().setCartes(mainJ1E2);
+        equipes[1].getJoueur2().setCartes(mainJ2E2);
     }
 
     private void calcScore() {

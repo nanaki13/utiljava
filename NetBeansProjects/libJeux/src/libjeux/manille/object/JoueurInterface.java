@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.manille.object;
 
+import libjeux.manille.object.Equipe;
 import java.util.List;
 
 /**

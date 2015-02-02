@@ -3,8 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.manille.serveur;
 
+import libjeux.manille.object.JoueurInterface;
+import libjeux.manille.object.Equipe;
+import libjeux.manille.ActionManilleListener;
+import libjeux.manille.Manille;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import libjeux.manille.ActionManilleListener;
+import libjeux.manille.Manille;
 
 /**
  *

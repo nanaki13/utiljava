@@ -3,11 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.manille.vue;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import libjeux.manille.object.Carte;
+import libjeux.manille.object.DefaultCompCarte;
+import libjeux.manille.object.JoueurInterface;
 
 /**
  *

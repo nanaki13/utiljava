@@ -3,13 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.manille;
+
+import libjeux.manille.object.JoueurDefault;
+import libjeux.manille.object.PointPlit;
+import libjeux.manille.object.PlitDeCarte;
+import libjeux.manille.object.CarteManille;
+import libjeux.manille.object.Carte;
+import libjeux.manille.Manille;
 
 /**
  *
  * @author jonathan
  */
-public class LibJeux {
+public class LaunchTest {
 
     /**
      * @param args the command line arguments
@@ -43,7 +50,7 @@ public class LibJeux {
         p.add(m3, j1e2);
         p.add(m4, j2e2);
         PointPlit count = p.count();
-        System.out.println("point : "+count.point+" meneur : "+count.meneur.getName());
+        System.out.println("point : "+count.getPoint()+" meneur : "+count.getMeneur().getName());
     }
     
 }

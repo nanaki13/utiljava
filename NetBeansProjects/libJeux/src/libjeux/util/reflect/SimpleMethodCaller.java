@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.util.reflect;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -44,7 +44,7 @@ public class SimpleMethodCaller {
             if (method != null) {
 //                System.out.println("method : " + methodS);
                 Class<?> returnType = method.getReturnType();
-                if ("void".equals(returnType.getName())) {
+                if (Void.class.equals(returnType)) {
                     int nbRead = method.getParameterTypes().length;
                     Object[] param = new Object[nbRead];
                     boolean haveNull = false;

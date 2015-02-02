@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.manille.object;
 
 import java.io.Serializable;
 
@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author jonathan
  */
-class Equipe implements Serializable {
+public class Equipe implements Serializable {
     JoueurInterface joueur1;
     JoueurInterface joueur2;
     private int score;
@@ -28,7 +28,7 @@ class Equipe implements Serializable {
     }
 
     
-    Equipe(String name) {
+    public Equipe(String name) {
         this.name = name;
     }
 
@@ -59,13 +59,21 @@ class Equipe implements Serializable {
         return name;
     }
 
-    int getScoreTotal() {
+    public int getScoreTotal() {
         return scoreTotal;
     }
 
     @Override
     public String toString() {
         return "Equipe{" + "name=" + name + '}';
+    }
+
+    public JoueurInterface getJoueur1() {
+        return joueur1;
+    }
+
+    public JoueurInterface getJoueur2() {
+        return joueur2;
     }
     
     

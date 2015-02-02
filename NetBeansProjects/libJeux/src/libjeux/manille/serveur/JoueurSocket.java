@@ -3,8 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.manille.serveur;
 
+import libjeux.manille.object.JoueurInterface;
+import libjeux.manille.object.Carte;
+import libjeux.manille.object.Equipe;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -241,10 +244,10 @@ class JoueurSocket implements JoueurInterface, Runnable, Serializable {
     public void setEquipes(Equipe mine, Equipe other) {
          try {
              equipe = mine;
-             if(mine.joueur1 == this){
-                 equipier = mine.joueur2;
+             if(mine.getJoueur1() == this){
+                 equipier = mine.getJoueur2();
              }else{
-                 equipier = mine.joueur1;
+                 equipier = mine.getJoueur1();
              }
              
             oos.writeObject("setEquipes");

@@ -3,15 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package libjeux;
+package libjeux.manille.vue;
 
 import java.util.List;
+import libjeux.manille.object.Carte;
+import libjeux.manille.object.JoueurInterface;
 
 /**
  *
  * @author jonathan
  */
-interface VuePlateau {
+public interface VuePlateau {
     
     public void afficheMain(List<Carte> main);
     
