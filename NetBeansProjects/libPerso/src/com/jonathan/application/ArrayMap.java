@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jonathan.utils;
+package com.jonathan.application;
 
 import java.util.AbstractCollection;
 import java.util.Collection;
@@ -138,7 +138,7 @@ public class ArrayMap<T, U>  implements Map<T, U> {
             }
 
             public boolean contains(Object k) {
-                return ArrayMap.this.containsKey(k);
+                return ArrayMap.this.containsKey((T)k);
             }
         };
     }

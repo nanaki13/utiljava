@@ -406,6 +406,37 @@ public class StringTool {
             Logger.getLogger(StringTool.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+     
+     /**
+     *Met le première lettre en majuscule
+     * @param str
+     * @return str(ref)
+     */
+    public static String ucFirst(String str) {
+        if(!str.isEmpty()){
+            StringBuilder strBf = new StringBuilder(str);
+            char deb = strBf.charAt(0);
+            deb = Character.toUpperCase(deb);
+            strBf.setCharAt(0, deb);
+            str=new String(strBf);
+        }
+       
+            return str;
+        
+    }
+    
+     public static String lcFirst(String str) {
+        if(!str.isEmpty()){
+            StringBuilder strBf = new StringBuilder(str);
+            char deb = strBf.charAt(0);
+            deb = Character.toLowerCase(deb);
+            strBf.setCharAt(0, deb);
+            str=new String(strBf);
+        }
+       
+            return str;
+        
+    }
 
 
 }

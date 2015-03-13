@@ -261,4 +261,16 @@ class JoueurSocket implements JoueurInterface, Runnable, Serializable {
             Logger.getLogger(JoueurSocket.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    public void setTourDe(int id) {
+         try {
+            oos.writeObject("setTourDe");
+            wait0();
+            oos.writeObject(id);
+             wait0();
+
+        } catch (IOException ex) {
+            Logger.getLogger(JoueurSocket.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

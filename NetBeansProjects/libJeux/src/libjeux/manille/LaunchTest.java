@@ -11,6 +11,8 @@ import libjeux.manille.object.PlitDeCarte;
 import libjeux.manille.object.CarteManille;
 import libjeux.manille.object.Carte;
 import libjeux.manille.Manille;
+import libjeux.manille.ia.JoueurIA;
+import libjeux.manille.object.JoueurInterface;
 
 /**
  *
@@ -22,10 +24,14 @@ public class LaunchTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        JoueurDefault j1e1 = new JoueurDefault("Jonathan",0);
-        JoueurDefault j2e1 = new JoueurDefault("Julie",1);
-        JoueurDefault j1e2 = new JoueurDefault("Matthieu",2);
-        JoueurDefault j2e2 = new JoueurDefault("Antonin",3);
+        JoueurInterface j1e1 = new JoueurDefault("Jonathan",0);
+//        JoueurInterface j2e1 = new JoueurDefault("Julie",1);
+//        JoueurInterface j1e2 = new JoueurDefault("Matthieu",2);
+//        JoueurInterface j2e2 = new JoueurDefault("Antonin",3);
+                JoueurInterface j2e1 = new JoueurIA(1);
+        JoueurInterface j1e2 = new JoueurIA(2);
+        JoueurInterface j2e2 = new JoueurIA(3);
+
         Manille m = new Manille(null);
         m.setJoueurs(j1e1, j2e1, j1e2, j2e2);
         m.run();

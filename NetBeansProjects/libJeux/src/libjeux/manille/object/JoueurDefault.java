@@ -33,14 +33,17 @@ public class JoueurDefault extends AbstractJoueur implements JoueurInterface, Se
 
     public JoueurDefault(String jonathan, int id) {
         super(jonathan, id);
+        vue = new VuePlateauConsole();
     }
 
     public JoueurDefault(int id) {
         super(id);
+        vue = new VuePlateauConsole();
     }
 
     public JoueurDefault(String name) {
         super(name);
+        vue = new VuePlateauConsole();
     }
 
     public JoueurDefault() {
@@ -83,8 +86,8 @@ public class JoueurDefault extends AbstractJoueur implements JoueurInterface, Se
         Carte get = null;
         do {
             try {
-//                readInLine = readInLine();
-                readInLine = "0";
+                readInLine = readInLine();
+//                readInLine = "0";
                 parseInt = Integer.parseInt(readInLine);
                 if (parseInt > -1 && parseInt < whatCanPlay.size()) {
                     get = whatCanPlay.get(parseInt);
@@ -101,6 +104,7 @@ public class JoueurDefault extends AbstractJoueur implements JoueurInterface, Se
 
 
 
+    @Override
     public void setAtout(Carte.CouleurCarte atout, String string) {
         message(string);
 

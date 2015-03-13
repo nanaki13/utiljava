@@ -144,8 +144,8 @@ public class Manille {
             atout = gaucheDonneur.getEquipier().chooseAtoutEnFace();
         }
         for (JoueurInterface j : joueurs) {
-            j.setAtout(atout, gaucheDonneur.getName() + " dit " + atout);
-
+            j.setAtout(atout, gaucheDonneur.getEquipier().getName() + " dit " + atout);
+            j.setTourDe(gaucheDonIndex);
         }
 
         plit.setAtout(atout);

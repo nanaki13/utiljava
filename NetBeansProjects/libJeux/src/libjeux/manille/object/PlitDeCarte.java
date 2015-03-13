@@ -102,9 +102,18 @@ public class PlitDeCarte {
         
     }
 
+    public JoueurInterface getMeneur() {
+        return meneur;
+    }
+    
+
     @Override
     public String toString() {
         return "PlitDeCarte{" + "plit=" + plit + ", meneur=" + meneur + ", point=" + (point + 1) + '}';
+    }
+
+    public Carte getMaster() {
+        return powerFull;
     }
 
 }

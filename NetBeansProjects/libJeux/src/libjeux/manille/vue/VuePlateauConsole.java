@@ -26,6 +26,7 @@ public class VuePlateauConsole implements VuePlateau{
         for(Carte c : main){
             System.out.print(c+":");
         }
+         System.out.println();
     }
 
     public void afficheChoix(List<Carte> main,List<Carte> playable) {

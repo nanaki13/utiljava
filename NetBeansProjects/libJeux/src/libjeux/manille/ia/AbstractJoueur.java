@@ -5,7 +5,9 @@
  */
 package libjeux.manille.ia;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import libjeux.manille.object.Carte;
 import libjeux.manille.object.Equipe;
 import libjeux.manille.object.JoueurInterface;
@@ -25,6 +27,8 @@ public abstract class AbstractJoueur implements JoueurInterface{
     protected JoueurInterface equipier;
     protected Carte.CouleurCarte atout;
     protected final transient PlitDeCarte plitDeCarte;
+    protected boolean  weGo;
+    private Map<Integer , JoueurInterface > jouersByid;
     
     public AbstractJoueur(String jonathan, int id) {
         this();
@@ -86,6 +90,11 @@ public abstract class AbstractJoueur implements JoueurInterface{
         }
         this.equipe = mine;
         this.other = other;
+        jouersByid = new HashMap<Integer, JoueurInterface>();
+        jouersByid.put(id, this);
+        jouersByid.put(equipier.getId(), equipier);
+        jouersByid.put(other.getJoueur1().getId(), other.getJoueur1());
+        jouersByid.put(other.getJoueur2().getId(), other.getJoueur2());
     }
 
     
@@ -102,6 +111,7 @@ public abstract class AbstractJoueur implements JoueurInterface{
 
     public void setAtout(Carte.CouleurCarte atout, String string) {
         this.atout = atout;
+        plitDeCarte.setAtout(atout);
     }
 
     public void setId(Integer id) {
@@ -111,7 +121,14 @@ public abstract class AbstractJoueur implements JoueurInterface{
     public Integer getId() {
         return id;
     }
-    
+    public void setTourDe(int idJoueur){
+        JoueurInterface get = jouersByid.get(idJoueur);
+        if(get.equals(this) || get.equals(equipier)){
+            weGo = true;
+        }else{
+            weGo = false;
+        }
+    }
       @Override
     public int hashCode() {
         int hash = 7;

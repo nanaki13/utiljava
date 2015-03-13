@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author jonathan
  */
-public abstract class Carte implements Serializable{
+public abstract class Carte implements Serializable,Comparable<Carte>{
 
     protected short force;
     private final NomCarte nom;
@@ -20,11 +20,45 @@ public abstract class Carte implements Serializable{
     public static final char TREFLE = '\u2663';
     public static final char COEUR = '\u2665';
     public static final char CARREAU = '\u2666';
+    
+    
 
     public Carte(short force, NomCarte nom, CouleurCarte couleurCarte) {
         this.force = force;
         this.nom = nom;
         this.couleurCarte = couleurCarte;
+    }
+     public Carte(String carte) throws CarteException {
+       String nomStr = carte.substring(0, carte.indexOf(' '));
+       String coul = carte.substring(carte.indexOf(' ')).trim();
+      if(nomStr.equals("7")){
+          nom = NomCarte.sept;
+      }else if(nomStr.equals("8")){
+          nom = NomCarte.huit;
+      }else if(nomStr.equals("9")){
+          nom = NomCarte.neuf;
+      }else if(nomStr.equals("10")){
+          nom = NomCarte.dix;
+      }else if(nomStr.equals("va")){
+          nom = NomCarte.valet;
+      }else if(nomStr.equals("da")){
+          nom = NomCarte.dame;
+      }else if(nomStr.equals("ro")){
+          nom = NomCarte.roi;
+      }else if(nomStr.equals("as")){
+          nom = NomCarte.as;
+      }else throw new CarteException("erreur : "+nomStr+" n'existe pas");
+      
+      if(coul.equals("co")){
+          couleurCarte = CouleurCarte.coeur;
+      }else if(coul.equals("ca")){
+          couleurCarte = CouleurCarte.carreau;
+      }else if(coul.equals("pi")){
+          couleurCarte = CouleurCarte.pique;
+      }else if(coul.equals("tr")){
+          couleurCarte = CouleurCarte.trefle;
+      }
+      else throw new CarteException("erreur : ("+coul+") n'existe pas");
     }
     public Carte(NomCarte nom, CouleurCarte couleurCarte) {
         this.nom = nom;

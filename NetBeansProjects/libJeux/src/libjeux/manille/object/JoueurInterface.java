@@ -32,4 +32,5 @@ public interface JoueurInterface {
     public void setAtout(Carte.CouleurCarte atout, String string);
     public void setId(Integer id);
     public Integer getId();
+    public void setTourDe(int id);
 }

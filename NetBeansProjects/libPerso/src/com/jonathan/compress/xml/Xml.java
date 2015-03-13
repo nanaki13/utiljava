@@ -5,7 +5,7 @@
  */
 package com.jonathan.compress.xml;
 
-import com.jonathan.utils.ArrayMap;
+import com.jonathan.application.ArrayMap;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.LinkedList;
