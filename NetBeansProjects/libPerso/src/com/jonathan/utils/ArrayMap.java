@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jonathan.application;
+package com.jonathan.utils;
 
 import java.util.AbstractCollection;
 import java.util.Collection;
