@@ -5,6 +5,8 @@
  */
 package net.badway.db;
 
+import net.badway.db.util.Reflexivite;
+import net.badway.db.util.ArrayMap;
 import net.badway.db.annotation.ManyToOne;
 import net.badway.db.annotation.SqlField;
 import net.badway.db.annotation.Id;

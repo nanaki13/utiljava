@@ -7,7 +7,7 @@ package net.badway.db.sql;
 
 import java.io.IOException;
 import java.util.List;
-import net.badway.db.Utils;
+import net.badway.db.util.Utils;
 
 /**
  *

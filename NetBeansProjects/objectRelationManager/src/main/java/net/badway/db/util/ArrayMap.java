@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.badway.db;
+package net.badway.db.util;
 
 import java.util.AbstractCollection;
 import java.util.Collection;
