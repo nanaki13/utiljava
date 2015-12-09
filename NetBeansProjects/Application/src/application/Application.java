@@ -22,7 +22,7 @@ import storage.DataJsonException;
 public class Application {
 
     /**
-     * @param args the command line arguments
+     * @param args the command line arguments coucou
      */
     public static void main(String[] args) throws  DataJsonException, IOException {
         Config config = new Config();
